@@ -12,6 +12,8 @@ export default createStore({
             data: [],
             error: ''
         },
+
+
     },
     mutations: {},
     actions: {},
