@@ -1,12 +1,14 @@
 <template>
-    <div id="nav">
-        <div class="st-text">Hello World</div>
-        <router-link to="/">Home</router-link>
-        |
-        <router-link to="/about">About</router-link>
-    </div>
+    <Topbar />
     <router-view/>
 </template>
+
+<script>
+import Topbar from "@/components/topbar/Topbar";
+export default {
+    components: {Topbar}
+}
+</script>
 
 <style lang="less">
 // the custom stylesheet here
