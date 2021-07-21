@@ -12,43 +12,57 @@ export const timetable: Module<any, any> = {
         isLoading: false
     },
     mutations: {
-        setIsLoading(state, {isLoading}: {isLoading: boolean}) {
+        setIsLoading(state, {isLoading}: { isLoading: boolean }) {
             state.isLoading = isLoading;
         },
-        setError(state, {error}: {error: string}) {
+        setError(state, {error}: { error: string }) {
             state.error = error;
         },
-        setTimetable(state, data: {data: TimetableData}) {
+        setTimetable(state, data: { data: TimetableData }) {
+            state.error = '';
             state.timetable = data;
         }
     },
     actions: {
-        async fetchTimetable(store, {date}: { date?: string }) {
-            // TODO: Write this;
-            const keycode = store.getters['keycode'];
-            const request = NetworkRequest.post({
-                url: TT,
-                data: {
-                    StudentKey: keycode,
-                    Date: date,
-                    Mode: "STU"
-                },
-                alias: "fetching timetable data"
-            });
+        async fetchTimetable(store, {date}: { date: string | undefined }) {
+            // a promise for sync purposes
+            return new Promise<boolean>(async (resolve) => {
+                store.commit('setIsLoading', {isLoading: true});
+                // create a request object
+                const keycode = store.rootGetters['auth/keycode'];
+                const request = NetworkRequest.post({
+                    url: TT,
+                    data: {
+                        StudentKey: keycode,
+                        Date: date ?? '21/09/2021',
+                        Mode: "STU"
+                    },
+                    alias: "fetching timetable data"
+                });
 
-            const onComplete = (response: RequestResponse) => {
-                if (response.ok) {
-                    const data = JSON.parse(response.text).d;
-                    store.commit('setTimetable', {
-                        data
-                    });
+                // complete handler, resolves if all done
+                const onComplete = (response: RequestResponse) => {
+                    store.commit('setIsLoading', {isLoading: false});
+
+                    if (response.ok) {
+                        const data = JSON.parse(response.text).d;
+                        store.commit('setTimetable', {
+                            data
+                        });
+                    } else {
+                        store.commit('setError', {
+                            error: response.text
+                        });
+                    }
+                    return resolve(true);
                 }
-            }
 
-            const response: RequestResponse = await store.dispatch('networkCall', {
-                request,
-            });
-            request.setOnComplete(onComplete)(response);
+                // send the response and call the handler
+                const response: RequestResponse = await store.dispatch('network/networkCall', {
+                    request,
+                }, {root: true});
+                request.setOnComplete(onComplete)(response);
+            })
         }
     }
 }

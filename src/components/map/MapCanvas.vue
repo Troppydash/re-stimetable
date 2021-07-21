@@ -8,12 +8,12 @@
                     <div class="st-form__control st-form__control--small" style="margin: 1rem 0">
                         <label class="st-form__label st-form__label--settings">
                             <span>Presets</span>
-                            <select class="st-select st-select--small" id="map-preset" @change="applyPreset">
+                            <select class="st-select st-select--small" v-model="preset">
                                 <option value="low">Potato</option>
                                 <option value="medium">Decent</option>
                                 <option value="high">Good</option>
                                 <option value="veryHigh">Best</option>
-                                <option value="custom">Custom</option>
+                                <option value="custom" disabled>Custom</option>
                             </select>
                         </label>
                     </div>
@@ -143,7 +143,7 @@ const MapPresets: Record<string, MapSettings> = {
 
 export default defineComponent({
     name: "MapCanvas",
-    props: ['onSelect', 'onClose', 'onFs'],
+    props: ['onSelect', 'onClose', 'onFs', 'selected'],
     data() {
         return {
             builder: null as unknown as (() => MapRendererBuilder | null),
@@ -166,10 +166,26 @@ export default defineComponent({
             }
             return 'ri-arrow-right-s-fill';
         },
+        preset: {
+            get(): string {
+                for (const [key, value] of Object.entries(MapPresets)) {
+                    if (JSON.stringify(this.settings) === JSON.stringify(value)) {
+                        return key;
+                    }
+                }
+                return 'custom';
+            },
+            set(value: string) {
+                if (value === 'custom') {
+                    return;
+                }
+                this.settings = MapPresets[value];
+            }
+        }
     },
     watch: {
-        settings() {
-            this.setPreset();
+        selected(newValue: string) {
+
         }
     },
     methods: {
@@ -236,29 +252,9 @@ export default defineComponent({
                 postprocessing,
             };
         },
-        setPreset() {
-            let preset = 'custom';
-            for (const [key, value] of Object.entries(MapPresets)) {
-                if (JSON.stringify(this.settings) === JSON.stringify(value)) {
-                    preset = key;
-                    break;
-                }
-            }
-            (document.getElementById('map-preset') as any).value = preset;
-        },
         applySettings() {
             WebSettings.instance.setSetting('map', this.settings);
             this.reloadMap();
-        },
-        applyPreset(event: Event) {
-            const target: any = event.target;
-            const preset = target.value;
-            if (preset === 'custom') {
-                target.value = 'custom';
-                return;
-            }
-            this.settings = MapPresets[preset];
-            target.value = preset;
         },
         reloadMap() {
             this.disposeMap();
@@ -352,7 +348,6 @@ export default defineComponent({
     },
     mounted() {
         this.loadMap();
-        this.setPreset();
     },
     beforeUnmount() {
         this.disposeMap()
@@ -372,6 +367,7 @@ export default defineComponent({
         left: 0;
         height: 100vh;
         width: 100vw;
+        z-index: 3;
     }
 
     .map-tooltip {

@@ -7,9 +7,21 @@
 <script>
 import Alert from "@/components/controls/Alerts/Alert";
 import DynamicTable from "@/components/timetable/DynamicTable";
+import {mapState} from "vuex";
 export default {
     name: "Timetable",
-    components: {DynamicTable, Alert}
+    components: {DynamicTable, Alert},
+    computed: {
+        ...mapState('timetable', ['timetable', 'isLoading', 'error'])
+    },
+    methods: {
+        async refreshTimetable() {
+            await this.$store.dispatch('timetable/fetchTimetable', { date: '21/09/2021'});
+        }
+    },
+    mounted() {
+        this.refreshTimetable();
+    }
 }
 </script>
 

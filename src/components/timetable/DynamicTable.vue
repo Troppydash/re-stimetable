@@ -18,7 +18,7 @@ export default {
     methods: {
         updateShowList() {
             this.showList = window.innerWidth <= 1024;
-        }
+        },
     },
     mounted() {
         window.addEventListener('resize', this.updateShowList);

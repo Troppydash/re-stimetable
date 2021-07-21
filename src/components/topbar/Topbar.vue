@@ -45,6 +45,8 @@ export default {
 }
 
 .topbar {
+    position: sticky;
+    top: 0;
     width: 900px;
     margin: 0 auto;
     background: var(--st-primary);
@@ -52,6 +54,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    z-index: 2;
 
     .topbar__actions {
         display: flex;
@@ -76,7 +79,7 @@ export default {
     }
 
     .topbar {
-        width: 100vw;
+        width: 100%;
     }
 
 }

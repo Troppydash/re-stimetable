@@ -1,6 +1,6 @@
 <template>
     <div class="">
-
+<!--        DESIGN A TABLE -->
     </div>
 </template>
 
@@ -10,11 +10,6 @@ export default {
     data() {
         return {}
     },
-    methods: {},
-    mounted() {
-    },
-    beforeUnmount() {
-    }
 }
 </script>
 
