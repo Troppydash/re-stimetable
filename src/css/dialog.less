@@ -1,0 +1,41 @@
+
+.st-dialog {
+    width: 60vw;
+    height: 80vh;
+
+    color: var(--st-text);
+    background: var(--st-background);
+    border: 2px solid var(--st-primary);
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-between;
+
+    .st-dialog__header {
+        border-bottom: 2px solid var(--st-secondary);
+
+        padding-bottom: 0.5rem;
+        margin: 1rem;
+    }
+
+    .st-dialog__body {
+        flex: 1 1;
+        overflow: auto;
+        margin: 0 1rem;
+    }
+
+    .st-dialog__footer {
+        border-top: 2px solid var(--st-secondary);
+
+        padding-top: 1rem;
+        margin: 1rem;
+
+        display: flex;
+        justify-content: right;
+
+        & > button + button {
+            margin-left: 0.5rem;
+        }
+    }
+}

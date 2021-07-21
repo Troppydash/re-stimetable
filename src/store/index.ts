@@ -1,21 +1,19 @@
 import {createStore} from 'vuex'
+import {auth} from "@/store/auth";
+import {timetable} from "@/store/timetable";
+import {WebSettings} from "@/lib/settings";
 
 export default createStore({
-    state: {
-        auth: {
-            username: '',
-            error: '',
-        },
-
-        timetable: {
-            isLoading: false,
-            data: [],
-            error: ''
-        },
-
-
-    },
+    state: {},
     mutations: {},
-    actions: {},
-    modules: {}
+    actions: {
+        init(store, {settings}: { settings: WebSettings }) {
+            const name = settings.getSetting('user-name');
+            store.dispatch('auth/init', {name});
+        }
+    },
+    modules: {
+        auth,
+        timetable,
+    }
 })

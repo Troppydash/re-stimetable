@@ -1,0 +1,44 @@
+.st-alert {
+    background: var(--st-background-hover);
+    color: var(--st-text);
+
+    border: 2px solid var(--st-primary);
+
+    position: relative;
+
+    min-width: 300px;
+    min-height: 50px;
+
+    display: flex;
+    flex-direction: column;
+
+    box-shadow: black 1px 1px 2px 1px;
+
+    .st-alert__title {
+        padding: 0.2rem 0.5rem 0;
+    }
+
+    .st-alert__body {
+        flex: 1 1;
+        padding: 0.1rem 2rem 0.5rem 0.5rem;
+        overflow: auto;
+        display: flex;
+        align-items: center;
+    }
+
+    .st-alert__dismiss {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 2rem;
+        width: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+
+        &:hover {
+            background: var(--st-background-focus);
+        }
+    }
+}

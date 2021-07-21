@@ -1,12 +1,16 @@
 import {Storage, WebStorage} from "@/lib/storage";
 
 const SettingsKeys = [
-    'color-mode'
+    'color-mode',
+    'user-name',
+    'user-keycode'
 ] as const;
 type SettingsKeyType = typeof SettingsKeys[number];
 
 const SettingsDefault: Record<SettingsKeyType, string> = {
-    "color-mode": "default"
+    "color-mode": "default",
+    'user-name': 'unnamed',
+    'user-keycode': 'qi t'
 }
 
 
@@ -14,24 +18,25 @@ export class WebSettings {
     public static instance = new WebSettings(Storage);
 
     constructor(private storage: WebStorage) {
+        this.init();
     }
 
-    public async init() {
+    public init() {
         for (const setting of SettingsKeys) {
-            if (!await this.storage.exists(setting)) {
-                // ignore error because it never fails
-                await this.storage.store(setting, SettingsDefault[setting]);
+            if (!this.storage.exists(setting)) {
+                this.storage.store(setting, SettingsDefault[setting]);
             }
         }
-        await this.storage.commit();
+        this.storage.commit();
     }
 
-    public async getSetting(key: SettingsKeyType) {
-        return await this.storage.view(key);
+    public getSetting(key: SettingsKeyType) {
+        return this.storage.view(key);
     }
 
-    public async setSetting(key: SettingsKeyType, value: any) {
-        await this.storage.store(key, value);
+    public setSetting(key: SettingsKeyType, value: any) {
+        this.storage.store(key, value);
+        this.storage.commit();
     }
 
 }

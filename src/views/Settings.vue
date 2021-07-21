@@ -4,7 +4,10 @@
 
 <script>
 export default {
-    name: "Settings"
+    name: "Settings",
+    mounted() {
+        this.$shadow.evoke("showAlert", "Hello World");
+    }
 }
 </script>
 

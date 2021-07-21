@@ -1,11 +1,11 @@
 export interface WebStorage {
-    store(key: string, value: any): Promise<boolean>;
+    store(key: string, value: any): boolean;
 
-    view(key: string): Promise<any>;
+    view(key: string): any;
 
-    exists(key: string): Promise<boolean>;
+    exists(key: string): boolean;
 
-    commit(): Promise<boolean>;
+    commit(): boolean;
 }
 
 // TODO: this is inefficient, but caching may make it better
@@ -40,31 +40,25 @@ export class LocalWebStorage implements WebStorage {
             return null;
 
         const obj = JSON.parse(db);
-        return obj[key] === undefined ?? null;
+        return obj[key] === undefined ? null : obj[key];
     }
 
     public store(key: string, value: any) {
-        return new Promise<boolean>(resolve => {
-            this.updateSettings(key, value);
-            resolve(true);
-        });
+        this.updateSettings(key, value);
+        return true;
     }
 
     public view(key: string) {
-        return new Promise(resolve => {
-            const item = this.getSetting(key);
-            resolve(item);
-        })
+        const item = this.getSetting(key);
+        return item;
     }
 
-    public exists(key: string): Promise<boolean> {
-        return new Promise<boolean>(resolve => {
-            resolve(this.existsSetting(key));
-        })
+    public exists(key: string) {
+        return this.existsSetting(key);
     }
 
-    commit(): Promise<boolean> {
-        return Promise.resolve(true);
+    commit() {
+        return true;
     }
 }
 
