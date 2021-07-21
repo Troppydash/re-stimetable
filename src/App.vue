@@ -32,10 +32,6 @@ body {
     min-height: 100vh;
 }
 
-* {
-    transition-duration: 100ms;
-}
-
 .st-text.st-text--bold {
     font-family: 'Roboto', sans-serif;
     font-weight: bold;

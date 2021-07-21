@@ -3,14 +3,24 @@ import {Storage, WebStorage} from "@/lib/storage";
 const SettingsKeys = [
     'color-mode',
     'user-name',
-    'user-keycode'
+    'user-keycode',
+    'map',
 ] as const;
 type SettingsKeyType = typeof SettingsKeys[number];
 
-const SettingsDefault: Record<SettingsKeyType, string> = {
+const SettingsDefault: Record<SettingsKeyType, any> = {
     "color-mode": "default",
+
     'user-name': 'unnamed',
-    'user-keycode': 'qi t'
+    'user-keycode': 'qi t',
+
+    "map": {
+        quality: 'balanced',  // power-saving, balanced, good, best,
+        shadows: 'balanced',  // ``, ``, ``, ``
+        smoothCamera: 'on',  // on, off,
+        textures: 'off',  // ``, ``
+        tod: 'afternoon',  // morning, afternoon, sunset, night, auto
+    }
 }
 
 

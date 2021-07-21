@@ -11,19 +11,23 @@
 </template>
 
 <script lang="ts">
+import {defineComponent} from 'vue';
 import Alert from "@/components/controls/Alerts/Alert.vue";
 
-export default {
+export default defineComponent({
     name: "AlertShadow",
     components: {Alert},
     data() {
         return {
-            alerts: [],
-            timeouts: [],
-        }
+            alerts: [] as {
+                text: string,
+                title?: string
+            }[],
+            timeouts: [] as (number | null)[],
+        };
     },
     computed: {
-        alertsReversed() {
+        alertsReversed(): any[] {
             const reversed = [...this.alerts];
             return reversed.reverse();
         }
@@ -31,7 +35,11 @@ export default {
     methods: {
         dismissAlert(index: number) {
             this.alerts.splice(index, 1);
-            clearTimeout(this.timeouts[index]);
+
+            const code = this.timeouts[index];
+            if (code !== null) {
+                clearTimeout(code);
+            }
             this.timeouts.splice(index, 1);
         },
         showAlert(text: string | {
@@ -61,9 +69,9 @@ export default {
 
     },
     mounted() {
-        this.$shadow.register('showAlert', this.showAlert);
+        (this as any).$shadow.register('showAlert', this.showAlert);
     }
-}
+});
 </script>
 
 <style lang="less" scoped>

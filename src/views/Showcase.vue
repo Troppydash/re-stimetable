@@ -1,30 +1,88 @@
 <template>
-    <div>
-        <Dialog :is-open="false">
-            <h1>Hello</h1>
-        </Dialog>
+    <div class="showcase">
+        <div class="showcase__header">
+            <h1 class="st-text st-text--400">STimetable</h1>
+            <h5 class="st-text st-text--120">A Timetable Management Website</h5>
+        </div>
+        <div>
+            <p class="st-text">It contains...</p>
+        </div>
+        <div>
+            <p class="st-text st-text--title">Your Timetable</p>
+            <div>
+            </div>
+        </div>
+        <div>
+            <p class="st-text st-text--title">And A Map</p>
+            <div style="margin-top: 2rem">
+                <MapCanvas/>
+            </div>
+        </div>
+        <div>
+            <p class="st-text st-text--title">You can...</p>
+        </div>
+        <div>
+            <p class="st-text">
+                View and tinker with the source code of the site
+                <a class="st-text st-text--link"
+                   target="_blank"
+                   href="https://github.com/Troppydash/re-stimetable">here</a>
+            </p>
+            <p class="st-text">
+                or find the source code of the map renderer
+                <a class="st-text st-text--link"
+                   target="_blank"
+                   href="https://github.com/Troppydash/stimetable">here</a>
+            </p>
+            <p class="st-text">
+                and the stylesheet
+                <a class="st-text st-text--link"
+                   target="_blank"
+                   href="https://github.com/Troppydash/stimetable.css">here</a>
+            </p>
+        </div>
     </div>
 </template>
 
 <script>
 import Dialog from "@/components/controls/Dialogs/Dialog";
+import MapCanvas from "@/components/map/MapCanvas";
 export default {
     name: 'Showcase',
-    components: {Dialog},
+    components: {MapCanvas, Dialog},
     methods: {
 
     },
     mounted() {
-        for (let i = 0; i < 2; i++) {
-            setTimeout(() => {
-                this.$shadow.evoke("showAlert", {text: "Hello World" + i, title: "A Title" + i});
-            }, 1000 * i);
-        }
 
     }
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
+
+.showcase {
+    margin: 0 auto;
+    padding: 2rem 2rem;
+    width: 70%;
+
+    overflow: hidden;
+
+    .showcase__header {
+        text-align: center;
+        margin-bottom: 5rem;
+    }
+
+    & > div {
+        margin-bottom: 2rem;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .showcase {
+        width: 95%;
+    }
+}
+
 
 </style>
