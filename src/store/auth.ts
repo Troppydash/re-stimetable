@@ -7,15 +7,22 @@ export const auth: Module<any, any> = {
         keycode: '',
         realName: '',
     },
+    getters: {
+        keycode(state) {
+            return state.keycode;
+        },
+    },
     mutations: {
-        setAuth(state, {username}: { username: string }) {
-            state.name = username;
+        setAuth(state, {name, keycode}: { name: string, keycode: string }) {
+            state.name = name;
+            state.keycode = keycode;
         }
     },
     actions: {
-        init(store, {name}) {
+        init(store, {user}: {user: any}) {
             store.commit('setAuth', {
-                username: name
+                name: user.name,
+                keycode: user.keycode
             });
         }
     }

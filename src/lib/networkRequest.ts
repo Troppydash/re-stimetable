@@ -5,16 +5,29 @@ export interface RequestResponse {
     text: string;
 }
 
+type OnCompleteCallback = (data: RequestResponse) => void;
+
 export class NetworkRequest {
-    constructor(private type: string, private url: string, private data: object | null) {
+    public onComplete: OnCompleteCallback;
+
+    constructor(private type: string,
+                private url: string,
+                private data: object | null,
+                public readonly alias?: string) {
+        this.onComplete = () => {};
     }
 
-    static get(url: string) {
-        return new NetworkRequest("GET", url, null);
+    public setOnComplete(callback: (data: RequestResponse) => void): OnCompleteCallback {
+        this.onComplete = callback;
+        return callback;
     }
 
-    static post(url: string, data: object) {
-        return new NetworkRequest("POST", url, data);
+    static get({url, alias}: {url: string, alias?: string}) {
+        return new NetworkRequest("GET", url, null, alias);
+    }
+
+    static post({url, data, alias}: {url: string, data: object, alias?: string}) {
+        return new NetworkRequest("POST", url, data, alias);
     }
 
     public async send(): Promise<RequestResponse> {

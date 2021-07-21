@@ -2,8 +2,7 @@ import {Storage, WebStorage} from "@/lib/storage";
 
 const SettingsKeys = [
     'color-mode',
-    'user-name',
-    'user-keycode',
+    'user',
     'map',
 ] as const;
 type SettingsKeyType = typeof SettingsKeys[number];
@@ -11,8 +10,10 @@ type SettingsKeyType = typeof SettingsKeys[number];
 const SettingsDefault: Record<SettingsKeyType, any> = {
     "color-mode": "default",
 
-    'user-name': 'unnamed',
-    'user-keycode': 'qi t',
+    'user': {
+        name: 'unnamed',
+        keycode: 'qi t',
+    },
 
     "map": {
         quality: 'balanced',  // power-saving, balanced, good, best,

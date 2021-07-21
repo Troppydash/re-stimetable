@@ -30,15 +30,9 @@ import {helpers} from "@/lib/helpers";
 export default {
     name: 'Topbar',
     computed: {
-        ...mapState({
-            name: 'auth/name'
-        }),
+        ...mapState('auth', ['name']),
         username() {
-            const name = this.name;
-            if (!name) {
-                return 'unnamed';
-            }
-            return helpers.stringLimit(name, 20);
+            return helpers.stringLimit(this.name, 20);
         }
     }
 }

@@ -5,8 +5,10 @@ import router from './router'
 import store from './store'
 import shadow from './lib/plugins/shadow'
 
-createApp(App)
+const app = createApp(App)
     .use(store)
     .use(router)
     .use(shadow)
     .mount('#app');
+
+(store as any).$app = app;

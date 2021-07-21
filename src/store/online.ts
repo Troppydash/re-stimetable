@@ -16,13 +16,15 @@ export const online: Module<any, any> = {
         }
     },
     actions: {
-        init(store) {
+        init(store, {onStateChange}: {onStateChange: (online: boolean) => {}}) {
             // no need to unregister, as the store lasts through router
             window.addEventListener('online', () => {
                 store.commit('setStatus', {isOnline: true});
+                onStateChange(true);
             });
             window.addEventListener('offline', () => {
                 store.commit('setStatus', {isOnline: false});
+                onStateChange(false);
             });
 
             // initial status
