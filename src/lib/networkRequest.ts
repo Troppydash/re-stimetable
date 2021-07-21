@@ -1,20 +1,20 @@
 
-interface RequestResponse {
+export interface RequestResponse {
     ok: boolean;
     code: number;
     text: string;
 }
 
-export class Request {
+export class NetworkRequest {
     constructor(private type: string, private url: string, private data: object | null) {
     }
 
     static get(url: string) {
-        return new Request("GET", url, null);
+        return new NetworkRequest("GET", url, null);
     }
 
     static post(url: string, data: object) {
-        return new Request("POST", url, data);
+        return new NetworkRequest("POST", url, data);
     }
 
     public async send(): Promise<RequestResponse> {

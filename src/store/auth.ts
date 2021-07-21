@@ -9,7 +9,7 @@ export const auth: Module<any, any> = {
     },
     mutations: {
         setAuth(state, {username}: { username: string }) {
-            state.username = username;
+            state.name = username;
         }
     },
     actions: {
