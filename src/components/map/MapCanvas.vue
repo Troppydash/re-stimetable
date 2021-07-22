@@ -59,13 +59,13 @@
                     </div>
                     <div class="st-form__control st-form__control--small">
                         <label class="st-form__label st-form__label--settings">
-                            <span>State</span>
+                            <span>Time Of Day</span>
                             <select class="st-select st-select--small" v-model="settings.tod">
                                 <option value="auto">Auto</option>
                                 <option value="morning">Morning</option>
                                 <option value="afternoon">Afternoon</option>
                                 <option value="sunset">Sunset</option>
-                                <option value="evening">Evening</option>
+                                <option value="night">Evening</option>
                             </select>
                         </label>
                     </div>
@@ -143,7 +143,7 @@ const MapPresets: Record<string, MapSettings> = {
 
 export default defineComponent({
     name: "MapCanvas",
-    props: ['onSelect', 'onClose', 'onFs', 'selected'],
+    props: ['onClose', 'onFs', 'selected'],
     data() {
         return {
             builder: null as unknown as (() => MapRendererBuilder | null),
@@ -185,7 +185,7 @@ export default defineComponent({
     },
     watch: {
         selected(newValue: string) {
-
+            this.builder()?.instance?.focusBuildingByName(newValue);
         }
     },
     methods: {
@@ -326,8 +326,7 @@ export default defineComponent({
                     {
                         method: 'onClickBuilding',
                         callback: arg => {
-                            if (this.onSelect)
-                                this.onSelect(arg[0].name);
+                            this.$emit('update:selected', arg[0].name);
                         }
                     }
                 ]))
@@ -367,7 +366,7 @@ export default defineComponent({
         left: 0;
         height: 100vh;
         width: 100vw;
-        z-index: 3;
+        z-index: 30;
     }
 
     .map-tooltip {
@@ -381,7 +380,7 @@ export default defineComponent({
         white-space: nowrap;
 
         border: 1px solid var(--st-text);
-        z-index: 1;
+        z-index: 10;
         pointer-events: none;
     }
 

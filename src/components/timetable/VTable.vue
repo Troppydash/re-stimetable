@@ -1,0 +1,220 @@
+<template>
+    <div class="st-vtable">
+        <!-- first column -->
+        <div v-if="isLoading" class="st-vtable__header"></div>
+        <div v-else class="st-vtable__header st-vtable__column">
+            <!-- This is the top right divider label -->
+            <div class="st-vtable__label">
+                <span class="st-text st-text--140">Period \ Date</span>
+            </div>
+            <!-- the row labels are here -->
+            <div v-for="(period, index) in leftestDay.periodData">
+                <p class="st-text st-text--130">Period {{ index+1 }}</p>
+                <p class="st-text">From {{ period.FromTime }} To {{ period.ToTime }}</p>
+            </div>
+        </div>
+
+        <!-- the rest of the data -->
+        <div v-if="isLoading" class="st-vtable__body"></div>
+        <div v-else class="st-vtable__body" id="vtable-body" ref="body">
+            <!-- left scroller-->
+            <div v-show="showLeftScroll" @click="() => scroll(-1)"
+                 class="st-vtable__scroller">
+                <i class="ri-arrow-left-s-fill"></i>
+            </div>
+            <!-- columns of each day -->
+            <div class="scroller" id="vtable-body-scroller" ref="scroller">
+                <div v-for="(day, index) in data"
+                     class="st-vtable__column" :class="{'st-vtable__column--friday': shouldSeparate(index)}">
+                    <!-- the date -->
+                    <div class="st-vtable__label">
+                        <span class="st-text st-text--140">{{ formatDate(day.Date) }}</span>
+                    </div>
+                    <div v-for="(period) in day.periodData">
+                        <p class="st-text st-text--120">{{ period.teacherTimeTable?.Desc }}</p>
+                        <p class="st-text">{{ period.teacherTimeTable?.Teacher }}</p>
+                        <p class="st-text" style="float: right">{{ period.teacherTimeTable?.Room }}</p>
+                    </div>
+                </div>
+            </div>
+            <!-- right scroller-->
+            <div v-show="showRightScroll" @click="() => scroll(1)"
+                 class="st-vtable__scroller st-vtable__scroller--right">
+                <i class="ri-arrow-right-s-fill"></i>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script lang="ts">
+import {defineComponent} from 'vue';
+import {TimetableData, TimetableDay} from "@/lib/data/timetable";
+import {DateParser} from "@/lib/dates/dateParser";
+import {PromiseHelpers} from "@/lib/promise/common";
+
+const COLUMN_WIDTH = 300;
+
+export default defineComponent({
+    name: "VTable",
+    props: ['content', 'isLoading', 'onMore'],
+    data() {
+        return {
+            bodyWidth: 0,
+            bodyVisible: 0,
+            bodyScroll: 0,
+            vtableBody: null as unknown as HTMLElement,
+            vtableBodyScroller: null as unknown as HTMLElement,
+        };
+    },
+    computed: {
+        sampleDay(): TimetableDay {
+            if (this.content.length === 0) {
+                return {periodData: []} as any;
+            }
+            return this.content[0];
+        },
+        data(): TimetableData {
+            return this.content;
+        },
+        showLeftScroll(): boolean {
+            return this.bodyScroll > 0;
+        },
+        showRightScroll(): boolean {
+            return this.bodyWidth > (this.bodyScroll + this.bodyVisible);
+        },
+        leftestDay(): TimetableDay {
+            if (this.content.length === 0) {
+                return {periodData: []} as any;
+            }
+            return this.content[~~(this.bodyScroll / COLUMN_WIDTH)];
+        }
+    },
+    methods: {
+        shouldSeparate(index: number) {
+            const day = this.data[index];
+            return index !== this.data.length
+                && DateParser.ReFormat(day.Date, DateParser.TT_FORMAT, 'dddd') === 'Friday';
+        },
+        scroller(): HTMLElement {
+            return this.$refs.scroller as any;
+        },
+        body(): HTMLElement {
+            return this.$refs.body as any;
+        },
+        scroll(multiplier: number = 1) {
+            this.bodyScroll += COLUMN_WIDTH * multiplier;
+            this.scroller().scrollTo({
+                left: this.bodyScroll,
+                behavior: 'smooth'
+            });
+            this.checkMore();
+        },
+        formatDate(date: string): string {
+            return DateParser.ReFormat(date, DateParser.TT_FORMAT, 'dddd, DD MMM')
+        },
+        updateSize() {
+            this.bodyWidth = this.scroller().scrollWidth;
+            this.bodyVisible = this.body().clientWidth;
+        },
+        async checkMore() {
+            if (this.bodyWidth - (this.bodyScroll + this.bodyVisible) < COLUMN_WIDTH/2) {
+                await this.onMore()
+                await PromiseHelpers.WaitUntil(() => this.scroller().scrollWidth !== 0);
+                this.updateSize();
+            }
+        }
+    },
+    async mounted() {
+        this.updateSize();
+        await PromiseHelpers.WaitUntil(() => !this.isLoading);
+        await this.checkMore();
+    }
+});
+</script>
+
+<style lang="less" scoped>
+@border-color1: var(--st-secondary);
+@border1: 1px solid @border-color1;
+@border-color2: var(--st-primary-focus);
+@border2: 2px dashed @border-color2;
+
+.st-vtable {
+    color: var(--st-text);
+
+    width: 100%;
+    display: flex;
+    font-family: 'Roboto Light', sans-serif;
+
+
+    .st-vtable__column {
+        flex: 0 0 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: stretch;
+        align-items: stretch;
+
+        border-right: @border1;
+
+        .st-vtable__label {
+            background: var(--st-primary-focus);
+            color: var(--st-primary-text);
+            padding: 0.5rem 1rem;
+            height: 10%;
+        }
+
+        & > div {
+            vertical-align: center;
+            text-align: left;
+            padding: 0.75rem;
+            height: calc((100% - 10%) / 6);
+        }
+
+        & > div:not(.st-vtable__label) + div:not(.st-vtable__label) {
+            border-top: @border1;
+        }
+
+        &.st-vtable__column--friday {
+            border-right: @border2;
+        }
+    }
+
+    .st-vtable__header {
+        flex: 0 0 200px;
+    }
+
+    .st-vtable__body {
+        width: calc(100% - 200px);
+        position: relative;
+
+        .scroller {
+            overflow: hidden;
+            display: flex;
+            justify-content: left;
+            align-items: stretch;
+        }
+
+        .st-vtable__scroller {
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.25);
+
+            &:hover {
+                background: rgba(0, 0, 0, 0.5);
+                cursor: pointer;
+            }
+
+            &.st-vtable__scroller--right {
+                right: 0;
+                left: initial;
+            }
+        }
+    }
+}
+
+</style>

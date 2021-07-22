@@ -29,7 +29,7 @@ body {
     font-family: 'Roboto', sans-serif; // dont like the light style
 
     margin: 0;
-    height: 100%;
+    min-height: 100vh;
 }
 
 #app {

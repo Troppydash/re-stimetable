@@ -1,8 +1,30 @@
 import {Module} from 'vuex';
 import {TimetableData} from "@/lib/data/timetable";
 import {NetworkRequest, RequestResponse} from "@/lib/networkRequest";
+import {DateParser} from "@/lib/dates/dateParser";
 
 const TT = 'https://spider.scotscollege.school.nz/Spider2011/Handlers/Timetable.asmx/GetTimeTable_ByStudentMode';
+
+function cleanData({data, date}: {data: TimetableData, date: string}): TimetableData {
+    data = data.filter(d => {
+        return DateParser.instance(d.Date, DateParser.TT_FORMAT).isAfter(DateParser.instance(date, DateParser.REQUEST_FORMAT))
+    });
+    return data;
+}
+
+function addData({data, oldData, date}: {data: TimetableData, oldData: TimetableData, date: string}): TimetableData {
+    const stringed = oldData.map(d => JSON.stringify(d));
+
+    data = cleanData({data, date});
+    for (const day of data) {
+        if (!stringed.includes(JSON.stringify(day))) {
+            oldData.push(day);
+        }
+    }
+
+    // shouldn't need to sort yet
+    return oldData;
+}
 
 export const timetable: Module<any, any> = {
     namespaced: true,
@@ -18,13 +40,43 @@ export const timetable: Module<any, any> = {
         setError(state, {error}: { error: string }) {
             state.error = error;
         },
-        setTimetable(state, data: { data: TimetableData }) {
+        setTimetable(state, {data}: { data: TimetableData }) {
             state.error = '';
             state.timetable = data;
-        }
+        },
     },
     actions: {
-        async fetchTimetable(store, {date}: { date: string | undefined }) {
+        async fetchMoreTimetable(store, {date}: { date: string }) {
+            return new Promise<boolean>(async (resolve) => {
+                const keycode = store.rootGetters['auth/keycode'];
+                const request = NetworkRequest.post({
+                    url: TT,
+                    data: {
+                        StudentKey: keycode,
+                        Date: date,
+                        Mode: "STU"
+                    },
+                    alias: "fetching additional timetable data"
+                });
+
+                const onComplete = (response: RequestResponse) => {
+                    if (response.ok) {
+                        const data = JSON.parse(response.text).d;
+                        store.commit('setTimetable', {
+                            data: addData({data, oldData: store.state.timetable, date})
+                        });
+                    }
+                    return resolve(true);
+                }
+
+                // send the response and call the handler
+                const response: RequestResponse = await store.dispatch('network/networkCall', {
+                    request,
+                }, {root: true});
+                request.setOnComplete(onComplete)(response);
+            })
+        },
+        async fetchTimetable(store, {date}: { date: string }) {
             // a promise for sync purposes
             return new Promise<boolean>(async (resolve) => {
                 store.commit('setIsLoading', {isLoading: true});
@@ -34,7 +86,7 @@ export const timetable: Module<any, any> = {
                     url: TT,
                     data: {
                         StudentKey: keycode,
-                        Date: date ?? '21/09/2021',
+                        Date: date,
                         Mode: "STU"
                     },
                     alias: "fetching timetable data"
@@ -47,7 +99,7 @@ export const timetable: Module<any, any> = {
                     if (response.ok) {
                         const data = JSON.parse(response.text).d;
                         store.commit('setTimetable', {
-                            data
+                            data: cleanData({data, date})
                         });
                     } else {
                         store.commit('setError', {

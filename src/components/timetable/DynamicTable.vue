@@ -1,15 +1,16 @@
 <template>
     <List v-if="showList"/>
-    <Table v-else/>
+    <VTable v-else :content="package.data" :is-loading="package.isLoading" :on-more="onMore"/>
 </template>
 
 <script>
-import Table from "./Table";
 import List from "./List";
+import VTable from "@/components/timetable/VTable";
 
 export default {
     name: "DynamicTable",
-    components: {List, Table},
+    components: {VTable, List},
+    props: ["package", "onMore"],
     data() {
         return {
             showList: false

@@ -1,20 +1,20 @@
 export type TimetableData = TimetableDay[];
-interface TimetableDay {
+export interface TimetableDay {
     Date: string;
     DateFormatted: string;
-    weekDay: string;
+    DayName: string;
     periodData: PeriodData[];
 }
 
-interface PeriodData {
+export interface PeriodData {
     PeriodID: string;
     FromTime: string;
     ToTime: string;
     Heading: string;
-    AdditionalData: AdditionalData;
+    teacherTimeTable: AdditionalData;
 }
 
-interface AdditionalData {
+export interface AdditionalData {
     Abbrev: string;
     Desc: string;
     Period: string;
