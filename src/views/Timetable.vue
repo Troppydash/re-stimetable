@@ -1,43 +1,89 @@
 <template>
     <div class="timetable">
-<br/>
-<br/>
-        <DynamicTable :package="package" :on-more="fetchMore"/>
+        <!-- Querying -->
+
+        <!-- Timetable -->
+        <div class="timetable__table">
+            <DynamicTable :package="package"
+                          :on-more="fetchMore"
+                          :on-select="handleSelect"/>
+        </div>
+
+        <!-- Map -->
+        <div :class="{'timetable__map': !fs}">
+            <MapCanvas :is-minimized="true"
+                       v-model:fs="fs"
+                       v-model:closed="closed"
+                       v-model:selected="selectedRoom"/>
+            <div class="timetable__open-map" v-show="closed">
+                <button @click="openMap"
+                        class="st-fab">
+                    <i class="ri-map-2-line"></i>
+                </button>
+            </div>
+        </div>
     </div>
 </template>
 
-<script>
-import Alert from "@/components/controls/Alerts/Alert";
-import DynamicTable from "@/components/timetable/DynamicTable";
+<script lang="ts">
+import {defineComponent} from "vue";
 import {mapState} from "vuex";
 import {DateParser} from "@/lib/dates/dateParser";
+import DynamicTable from "@/components/timetable/DynamicTable.vue";
+import Alert from "@/components/controls/Alerts/Alert.vue";
+import MapCanvas from "@/components/map/MapCanvas.vue";
+import { PeriodData} from "@/lib/data/timetable";
+import {WebSettings} from "@/lib/settings";
 
-export default {
+export default defineComponent({
     name: "Timetable",
-    components: {DynamicTable, Alert},
+    components: {MapCanvas, DynamicTable, Alert},
+    data() {
+        const closed = WebSettings.instance.getSetting('map-closed');
+        return {
+            selectedRoom: '',
+            fs: false,
+            closed,
+        }
+    },
     computed: {
         ...mapState('timetable', ['timetable', 'isLoading', 'error']),
         package() {
+            let that = this as any;
             return {
-                isLoading: this.isLoading,
-                data: this.timetable,
-                error: this.error
+                isLoading: that.isLoading,
+                data: that.timetable,
+                error: that.error,
             };
         }
     },
+    watch: {
+        closed(isClosed: boolean) {
+            WebSettings.instance.setSetting('map-closed', isClosed);
+        }
+    },
     methods: {
+        handleSelect(period: PeriodData) {
+            const room = period.teacherTimeTable?.Room;
+            if (room) {
+                this.selectedRoom = room;
+            }
+        },
+        openMap() {
+            this.closed = false;
+        },
         async refreshTimetable() {
             await this.$store.dispatch('timetable/fetchTimetable', {date: DateParser.TodayForRequest()});
         },
         async fetchMore() {
-            const lastDate = DateParser.AddDays(this.timetable[this.timetable.length-1].Date, DateParser.TT_FORMAT, 7, DateParser.REQUEST_FORMAT);
+            const lastDate = DateParser.AddDays(this.timetable[this.timetable.length - 1].Date, DateParser.TT_FORMAT, 7, DateParser.REQUEST_FORMAT);
             await this.$store.dispatch('timetable/fetchMoreTimetable', {date: lastDate});
         }
     },
     mounted() {
         this.refreshTimetable();
     }
-}
+});
 </script>
 
 <style lang="less" scoped>
@@ -46,6 +92,20 @@ export default {
     margin: 0 auto;
     padding: 2rem 2rem;
     width: 90%;
+
+
+    .timetable__map {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        width: 30vw;
+    }
+
+    .timetable__open-map {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+    }
 }
 
 @media screen and (max-width: 1024px) {

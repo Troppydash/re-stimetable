@@ -1,6 +1,6 @@
 <template>
-    <div class="map-container" :class="{'map-container--fs': isFs}">
-        <div class="map-sidebar">
+    <div v-show="!closed" class="map-container" :class="{'map-container--fs': isFs}">
+        <div v-show="isFs || !isSmall" class="map-sidebar">
             <div class="map-siderbar__body" v-show="isSidebarOpen">
                 <!-- TODO: Make this a flex box so more settings can scroll -->
                 <p class="st-text st-text--150 settings-text">Settings</p>
@@ -79,10 +79,14 @@
             </div>
         </div>
         <div class="map-controls">
-            <button class="st-fab st-fab--opaque" v-if="onClose" @click="onClose">
+            <button class="st-fab st-fab--opaque"
+                    :class="{'st-fab--small': !isFs && isSmall}"
+                    v-if="!fs && closed !== undefined" @click="handleClose">
                 <i class="ri-close-line"></i>
             </button>
-            <button class="st-fab st-fab--opaque" @click="toggleFullscreen">
+            <button class="st-fab st-fab--opaque"
+                    :class="{'st-fab--small': !isFs && isSmall}"
+                    @click="toggleFullscreen">
                 <i class="ri-fullscreen-line"></i>
             </button>
         </div>
@@ -143,7 +147,7 @@ const MapPresets: Record<string, MapSettings> = {
 
 export default defineComponent({
     name: "MapCanvas",
-    props: ['onClose', 'onFs', 'selected'],
+    props: ['closed', 'fs', 'selected', 'isMinimized'],
     data() {
         return {
             builder: null as unknown as (() => MapRendererBuilder | null),
@@ -160,6 +164,9 @@ export default defineComponent({
         }
     },
     computed: {
+        isSmall(): boolean {
+            return !!this.isMinimized;
+        },
         arrowClass() {
             if (this.isSidebarOpen) {
                 return 'ri-arrow-left-s-fill';
@@ -185,10 +192,26 @@ export default defineComponent({
     },
     watch: {
         selected(newValue: string) {
-            this.builder()?.instance?.focusBuildingByName(newValue);
+            if (newValue) {
+                this.builder()?.instance?.focusBuildingByName(newValue);
+            }
+        },
+        fs(isFs: boolean) {
+            if (this.isFs !== isFs) {
+                this.toggleFullscreen();
+            }
+        },
+        closed(isClosed: boolean) {
+            if (!isClosed) {
+                this.loadMap();
+            }
         }
     },
     methods: {
+        handleClose() {
+            this.disposeMap();
+            this.$emit('update:closed', true);
+        },
         deriveAttributes() {
             const settings: MapSettings = WebSettings.instance.getSetting('map');
             this.settings = settings;
@@ -321,6 +344,7 @@ export default defineComponent({
                         method: "onToggleFullscreen",
                         callback: ([isFs]) => {
                             this.isFs = isFs;
+                            this.$emit('update:fs', isFs);
                         }
                     },
                     {
@@ -339,7 +363,6 @@ export default defineComponent({
         },
         toggleFullscreen() {
             this.builder()?.instance?.toggleFullscreen();
-            this.onFs(this.isFs);
         },
         toggleSidebar() {
             this.isSidebarOpen = !this.isSidebarOpen;

@@ -22,3 +22,16 @@ export interface AdditionalData {
     Teacher: string;
     Year: string
 }
+
+export function EncodePeriod({period, day}: {period: PeriodData, day: TimetableDay}): string {
+    return `${day.Date}|${period.PeriodID}|${period.teacherTimeTable?.Room ?? 'ERR'}`;
+}
+
+export function DecodePeriod(encoded: string): {date: string, periodID: string, room: string} {
+    const [date, periodID, room] = encoded.split('|');
+    return {
+        date,
+        periodID,
+        room
+    };
+}

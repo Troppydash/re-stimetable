@@ -4,6 +4,7 @@ const SettingsKeys = [
     'color-mode',
     'user',
     'map',
+    'map-closed'
 ] as const;
 type SettingsKeyType = typeof SettingsKeys[number];
 
@@ -21,7 +22,9 @@ const SettingsDefault: Record<SettingsKeyType, any> = {
         smoothCamera: 'on',  // on, off,
         textures: 'off',  // ``, ``
         tod: 'afternoon',  // morning, afternoon, sunset, night, auto
-    }
+    },
+
+    'map-closed': false,
 }
 
 

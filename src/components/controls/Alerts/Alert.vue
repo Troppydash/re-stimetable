@@ -10,8 +10,11 @@
     </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import {defineComponent} from "vue";
+
+
+export default defineComponent({
     name: "Alert",
     props: ["onDismiss", "timeout", "onTimeout", "title"],
     mounted() {
@@ -25,7 +28,7 @@ export default {
             }, this.timeout);
         }
     }
-}
+});
 </script>
 
 <style lang="less">

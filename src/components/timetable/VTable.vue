@@ -9,7 +9,7 @@
             </div>
             <!-- the row labels are here -->
             <div v-for="(period, index) in leftestDay.periodData">
-                <p class="st-text st-text--130">Period {{ index+1 }}</p>
+                <p class="st-text st-text--130">Period {{ index + 1 }}</p>
                 <p class="st-text">From {{ period.FromTime }} To {{ period.ToTime }}</p>
             </div>
         </div>
@@ -30,7 +30,9 @@
                     <div class="st-vtable__label">
                         <span class="st-text st-text--140">{{ formatDate(day.Date) }}</span>
                     </div>
-                    <div v-for="(period) in day.periodData">
+                    <div v-for="(period) in day.periodData"
+                         @click="() => handleSelect({day,period})"
+                    :class="{'st-vtable--selected': focused && focused === encode({period, day})}">
                         <p class="st-text st-text--120">{{ period.teacherTimeTable?.Desc }}</p>
                         <p class="st-text">{{ period.teacherTimeTable?.Teacher }}</p>
                         <p class="st-text" style="float: right">{{ period.teacherTimeTable?.Room }}</p>
@@ -48,7 +50,7 @@
 
 <script lang="ts">
 import {defineComponent} from 'vue';
-import {TimetableData, TimetableDay} from "@/lib/data/timetable";
+import {EncodePeriod, PeriodData, TimetableData, TimetableDay} from "@/lib/data/timetable";
 import {DateParser} from "@/lib/dates/dateParser";
 import {PromiseHelpers} from "@/lib/promise/common";
 
@@ -56,7 +58,7 @@ const COLUMN_WIDTH = 300;
 
 export default defineComponent({
     name: "VTable",
-    props: ['content', 'isLoading', 'onMore'],
+    props: ['content', 'isLoading', 'onMore', 'onSelect'],
     data() {
         return {
             bodyWidth: 0,
@@ -64,15 +66,11 @@ export default defineComponent({
             bodyScroll: 0,
             vtableBody: null as unknown as HTMLElement,
             vtableBodyScroller: null as unknown as HTMLElement,
+            focused: null as string | null
         };
     },
+    watch: {},
     computed: {
-        sampleDay(): TimetableDay {
-            if (this.content.length === 0) {
-                return {periodData: []} as any;
-            }
-            return this.content[0];
-        },
         data(): TimetableData {
             return this.content;
         },
@@ -90,6 +88,13 @@ export default defineComponent({
         }
     },
     methods: {
+        encode: EncodePeriod,
+        handleSelect({period, day}: {period: PeriodData, day: TimetableDay}) {
+            if (this.onSelect) {
+                this.onSelect(period);
+            }
+            this.focused = EncodePeriod({period, day});
+        },
         shouldSeparate(index: number) {
             const day = this.data[index];
             return index !== this.data.length
@@ -117,8 +122,10 @@ export default defineComponent({
             this.bodyVisible = this.body().clientWidth;
         },
         async checkMore() {
-            if (this.bodyWidth - (this.bodyScroll + this.bodyVisible) < COLUMN_WIDTH/2) {
-                await this.onMore()
+            if (this.bodyWidth - (this.bodyScroll + this.bodyVisible) < COLUMN_WIDTH / 2) {
+                if (this.onMore) {
+                    await this.onMore()
+                }
                 await PromiseHelpers.WaitUntil(() => this.scroller().scrollWidth !== 0);
                 this.updateSize();
             }
@@ -155,6 +162,8 @@ export default defineComponent({
 
         border-right: @border1;
 
+        cursor: pointer;
+
         .st-vtable__label {
             background: var(--st-primary-focus);
             color: var(--st-primary-text);
@@ -163,7 +172,6 @@ export default defineComponent({
         }
 
         & > div {
-            vertical-align: center;
             text-align: left;
             padding: 0.75rem;
             height: calc((100% - 10%) / 6);
@@ -176,10 +184,16 @@ export default defineComponent({
         &.st-vtable__column--friday {
             border-right: @border2;
         }
+
+
+        .st-vtable--selected {
+            background: var(--st-background-focus);
+        }
     }
 
     .st-vtable__header {
         flex: 0 0 200px;
+        cursor: initial;
     }
 
     .st-vtable__body {
@@ -205,7 +219,7 @@ export default defineComponent({
             background: rgba(0, 0, 0, 0.25);
 
             &:hover {
-                background: rgba(0, 0, 0, 0.5);
+                background: rgba(0, 0, 0, 0.35);
                 cursor: pointer;
             }
 

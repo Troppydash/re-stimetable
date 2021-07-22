@@ -9,14 +9,15 @@
         </div>
         <div>
             <p class="st-text st-text--title">Your Timetable</p>
-            <div>
-            </div>
+        </div>
+        <div>
+            <ExampleTable />
         </div>
         <div>
             <p class="st-text st-text--title">And A Map</p>
-            <div style="margin-top: 2rem">
-                <MapCanvas/>
-            </div>
+        </div>
+        <div>
+            <MapCanvas/>
         </div>
         <div>
             <p class="st-text st-text--title">You can...</p>
@@ -47,9 +48,11 @@
 <script>
 import Dialog from "@/components/controls/Dialogs/Dialog";
 import MapCanvas from "@/components/map/MapCanvas";
+import DynamicTable from "@/components/timetable/DynamicTable";
+import ExampleTable from "@/components/timetable/ExampleTable";
 export default {
     name: 'Showcase',
-    components: {MapCanvas, Dialog},
+    components: {ExampleTable, DynamicTable, MapCanvas, Dialog},
     data() {
         return {
         }
@@ -71,11 +74,11 @@ export default {
 
     .showcase__header {
         text-align: center;
-        margin-bottom: 5rem;
+        margin-bottom: 2rem;
     }
 
     & > div {
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
     }
 }
 
