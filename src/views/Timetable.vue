@@ -1,6 +1,9 @@
 <template>
     <div class="timetable">
         <!-- Querying -->
+        <div class="timetable__filter">
+            <Filterer v-model:filter="filter"/>
+        </div>
 
         <!-- Timetable -->
         <div class="timetable__table">
@@ -32,15 +35,17 @@ import {DateParser} from "@/lib/dates/dateParser";
 import DynamicTable from "@/components/timetable/DynamicTable.vue";
 import Alert from "@/components/controls/Alerts/Alert.vue";
 import MapCanvas from "@/components/map/MapCanvas.vue";
-import { PeriodData} from "@/lib/data/timetable";
+import {PeriodData} from "@/lib/data/timetable";
 import {WebSettings} from "@/lib/settings";
+import Filterer from "@/components/controls/Filter/Filterer.vue";
 
 export default defineComponent({
     name: "Timetable",
-    components: {MapCanvas, DynamicTable, Alert},
+    components: {Filterer, MapCanvas, DynamicTable, Alert},
     data() {
         const closed = WebSettings.instance.getSetting('map-closed');
         return {
+            filter: (a: any) => a,
             selectedRoom: '',
             fs: false,
             closed,
@@ -52,7 +57,7 @@ export default defineComponent({
             let that = this as any;
             return {
                 isLoading: that.isLoading,
-                data: that.timetable,
+                data: that.filter(that.timetable),
                 error: that.error,
             };
         }
@@ -72,7 +77,7 @@ export default defineComponent({
         openMap() {
             this.closed = false;
         },
-        async refreshTimetable() {
+        async fetchTimetable() {
             await this.$store.dispatch('timetable/fetchTimetable', {date: DateParser.TodayForRequest()});
         },
         async fetchMore() {
@@ -81,7 +86,7 @@ export default defineComponent({
         }
     },
     mounted() {
-        this.refreshTimetable();
+        this.fetchTimetable();
     }
 });
 </script>
@@ -93,6 +98,11 @@ export default defineComponent({
     padding: 2rem 2rem;
     width: 90%;
 
+
+    .timetable__filter {
+        float: right;
+        margin-bottom: 2rem;
+    }
 
     .timetable__map {
         position: fixed;

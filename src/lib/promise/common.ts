@@ -9,4 +9,19 @@ export namespace PromiseHelpers {
             }, delay)
         })
     }
+
+    export function Debounce(fn: any, delay: number = 100): any {
+        let hit = false;
+        let code = 0;
+        return function (...args: any[]) {
+            if (hit) {
+                clearTimeout(code);
+            }
+            hit = true;
+            code = setTimeout(() => {
+                fn(...args);
+                hit = false;
+            }, delay);
+        }
+    }
 }

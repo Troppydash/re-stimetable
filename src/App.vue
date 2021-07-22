@@ -2,6 +2,7 @@
     <Topbar/>
     <router-view/>
     <AlertShadow/>
+    <UpdateHandler/>
 </template>
 
 <script>
@@ -10,9 +11,10 @@ import {WebSettings} from "@/lib/settings";
 import Notifications from "@/components/controls/Alerts/AlertShadow";
 import Alert from "@/components/controls/Alerts/Alert";
 import AlertShadow from "@/components/controls/Alerts/AlertShadow";
+import UpdateHandler from "@/components/workers/UpdateHandler";
 
 export default {
-    components: {AlertShadow, Alert, Notifications, Topbar},
+    components: {UpdateHandler, AlertShadow, Alert, Notifications, Topbar},
     mounted() {
         this.$store.dispatch('init', { settings: WebSettings.instance});
     }

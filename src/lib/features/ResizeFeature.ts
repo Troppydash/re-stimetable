@@ -2,7 +2,6 @@ import {PartialFeatures} from "@/lib/features/PartialFeatures";
 import {MapRenderer, MapRendererRefs} from "@stimetable/map-renderer/lib/renderer/mapRenderer";
 import {RecursivePartial} from "@stimetable/map-renderer/lib/renderer";
 import {DeepAssign} from "@stimetable/map-renderer/lib/renderer/mapRendererSettingsHelpers";
-import {helpers} from "@/lib/helpers";
 
 export interface AutoresizeFeatureSettings {
     newSize: (self: ResizeFeature) => {
@@ -25,7 +24,7 @@ export class ResizeFeature extends PartialFeatures {
         delay: 100,
     }
 
-    private settings: AutoresizeFeatureSettings;
+    private readonly settings: AutoresizeFeatureSettings;
 
     constructor(
         settings: RecursivePartial<AutoresizeFeatureSettings> = ResizeFeature.defaultSettings,
