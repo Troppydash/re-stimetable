@@ -10,16 +10,16 @@ export namespace PromiseHelpers {
         })
     }
 
-    export function Debounce(fn: any, delay: number = 100): any {
+    export function Debounce( fn: any, delay: number = 100): any {
         let hit = false;
         let code = 0;
-        return function (...args: any[]) {
+        return function(this: any, ...args: any[]) {
             if (hit) {
                 clearTimeout(code);
             }
             hit = true;
             code = setTimeout(() => {
-                fn(...args);
+                fn.bind(this)(...args);
                 hit = false;
             }, delay);
         }

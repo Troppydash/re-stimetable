@@ -2,7 +2,7 @@
     <div class="timetable">
         <!-- Querying -->
         <div class="timetable__filter">
-            <Filterer v-model:filter="filter"/>
+            <Filterer v-model:filter="filter" :today="today"/>
         </div>
 
         <!-- Timetable -->
@@ -35,7 +35,7 @@ import {DateParser} from "@/lib/dates/dateParser";
 import DynamicTable from "@/components/timetable/DynamicTable.vue";
 import Alert from "@/components/controls/Alerts/Alert.vue";
 import MapCanvas from "@/components/map/MapCanvas.vue";
-import {PeriodData} from "@/lib/data/timetable";
+import {TimetableDay, WebTimetablePeriod} from "@/lib/data/timetable";
 import {WebSettings} from "@/lib/settings";
 import Filterer from "@/components/controls/Filter/Filterer.vue";
 
@@ -57,9 +57,27 @@ export default defineComponent({
             let that = this as any;
             return {
                 isLoading: that.isLoading,
-                data: that.filter(that.timetable),
+                data: that.filter(that.data),
                 error: that.error,
             };
+        },
+        data(): TimetableDay[] {
+            // just trust me buddy
+            // @ts-ignore
+            return Object.values(this.timetable).sort((left: TimetableDay, right: TimetableDay) => {
+                const ld = left[0].Date;
+                const rd = right[0].Date;
+                if (ld === rd) {
+                    return 0;
+                }
+                if (DateParser.IsBefore(ld, rd)) {
+                    return -1;
+                }
+                return 1;
+            });
+        },
+        today() {
+            return DateParser.Today();
         }
     },
     watch: {
@@ -68,7 +86,7 @@ export default defineComponent({
         }
     },
     methods: {
-        handleSelect(period: PeriodData) {
+        handleSelect(period: WebTimetablePeriod) {
             const room = period.teacherTimeTable?.Room;
             if (room) {
                 this.selectedRoom = room;
@@ -78,11 +96,12 @@ export default defineComponent({
             this.closed = false;
         },
         async fetchTimetable() {
-            await this.$store.dispatch('timetable/fetchTimetable', {date: DateParser.TodayForRequest()});
+            // await this.$store.dispatch('timetable/fetchTimetable', {date: DateParser.TodayForRequest()});
         },
         async fetchMore() {
-            const lastDate = DateParser.AddDays(this.timetable[this.timetable.length - 1].Date, DateParser.TT_FORMAT, 7, DateParser.REQUEST_FORMAT);
-            await this.$store.dispatch('timetable/fetchMoreTimetable', {date: lastDate});
+            const data = this.data;
+            const lastDate = DateParser.AddDays(data[data.length - 1][0].Date, DateParser.COMMON_FORMAT, 7, DateParser.REQUEST_FORMAT);
+            // await this.$store.dispatch('timetable/fetchMoreTimetable', {date: lastDate});
         }
     },
     mounted() {

@@ -4,7 +4,7 @@
             :content="package.data"
             :is-loading="package.isLoading"
             :on-more="onMore"
-            :on-select="onSelect"/>
+            v-model:selected="_selected"/>
 </template>
 
 <script>
@@ -15,10 +15,19 @@ import {defineComponent} from "vue";
 export default defineComponent({
     name: "DynamicTable",
     components: {VTable, List},
-    props: ["package", "onMore", "onSelect"],
+    props: ["package", "onMore", "onSelect", 'selected'],
     data() {
         return {
-            showList: false
+            showList: false,
+            _selected: this.selected
+        }
+    },
+    watch: {
+        selected(newSelected) {
+            this._selected = newSelected;
+        },
+        _selected() {
+            this.$emit('update:selected', this._selected);
         }
     },
     methods: {
@@ -28,6 +37,7 @@ export default defineComponent({
     },
     mounted() {
         window.addEventListener('resize', this.updateShowList);
+        this.updateShowList();
     },
     beforeUnmount() {
         window.removeEventListener('resize', this.updateShowList);

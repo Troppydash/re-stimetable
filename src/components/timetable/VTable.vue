@@ -21,7 +21,7 @@
                 <span class="st-text st-text--110">Period \ Date</span>
             </div>
             <!-- the row labels are here -->
-            <div v-for="(period, index) in leftestDay.periodData">
+            <div v-for="(period, index) in leftestDay">
                 <p class="st-text">Period {{ index + 1 }}</p>
                 <p class="st-text st-text--80">From {{ period.FromTime }} To {{ period.ToTime }}</p>
             </div>
@@ -55,18 +55,18 @@
             </div>
             <!-- columns of each day -->
             <div class="scroller" ref="scroller">
-                <div v-for="(day, index) in data"
+                <div v-for="(day, index) in content"
                      class="st-vtable__column" :class="{'st-vtable__column--friday': shouldSeparate(index)}">
                     <!-- the date -->
                     <div class="st-vtable__label">
-                        <span class="st-text st-text--110">{{ formatDate(day.Date) }}</span>
+                        <span class="st-text st-text--110">{{ formatDate(day[0].Date) }}</span>
                     </div>
-                    <div v-for="(period) in day.periodData"
-                         @click="() => handleSelect({day,period})"
-                         :class="{'st-vtable--selected': focused && focused === encode({period, day})}">
-                        <p class="st-text">{{ period.teacherTimeTable?.Desc }}</p>
-                        <p class="st-text st-text--80">{{ period.teacherTimeTable?.Teacher }}</p>
-                        <p class="st-text" style="float: right">{{ period.teacherTimeTable?.Room }}</p>
+                    <div v-for="(period) in day"
+                         @click="() => handleSelect(period)"
+                         :class="{'st-vtable--selected': selected && selected === encode({period})}">
+                        <p class="st-text">{{ period.Desc }}</p>
+                        <p class="st-text st-text--80">{{ period.Teacher }}</p>
+                        <p class="st-text" style="float: right">{{ period.Room }}</p>
                     </div>
                 </div>
             </div>
@@ -81,7 +81,13 @@
 
 <script lang="ts">
 import {defineComponent} from 'vue';
-import {EncodePeriod, PeriodData, TimetableData, TimetableDay} from "@/lib/data/timetable";
+import {
+    EncodePeriod,
+    WebTimetablePeriod,
+    WebTimetableData,
+    WebTimetableDay,
+    TimetablePeriod, TimetableData, TimetableDay
+} from "@/lib/data/timetable";
 import {DateParser} from "@/lib/dates/dateParser";
 import {PromiseHelpers} from "@/lib/promise/common";
 
@@ -89,7 +95,7 @@ const COLUMN_WIDTH = 300;
 
 export default defineComponent({
     name: "VTable",
-    props: ['content', 'isLoading', 'onMore', 'onSelect'],
+    props: ['content', 'isLoading', 'onMore', 'selected'],
     data() {
         return {
             bodyWidth: 0,
@@ -97,14 +103,19 @@ export default defineComponent({
             bodyScroll: 0,
             vtableBody: null as unknown as HTMLElement,
             vtableBodyScroller: null as unknown as HTMLElement,
-            focused: null as string | null
         };
     },
-    watch: {},
+    watch: {
+        async content(newContent: TimetableDay[], oldContent: TimetableDay[]) {
+            await this.waitForUpdate();
+            if (newContent.length < oldContent.length) {
+                this.bodyScroll = 0;
+                this.scroll(0);
+            }
+            this.updateSize();
+        }
+    },
     computed: {
-        data(): TimetableData {
-            return this.content;
-        },
         showLeftScroll(): boolean {
             return this.bodyScroll > 0;
         },
@@ -113,23 +124,23 @@ export default defineComponent({
         },
         leftestDay(): TimetableDay {
             if (this.content.length === 0) {
-                return {periodData: []} as any;
+                const data = Object.values(this.$store.getters['timetable/timetable']);
+                if (data.length > 0)
+                    return data[0] as TimetableDay;
+                return [] as any;
             }
             return this.content[~~(this.bodyScroll / COLUMN_WIDTH)];
         }
     },
     methods: {
         encode: EncodePeriod,
-        handleSelect({period, day}: { period: PeriodData, day: TimetableDay }) {
-            if (this.onSelect) {
-                this.onSelect(period);
-            }
-            this.focused = EncodePeriod({period, day});
+        handleSelect(period: TimetablePeriod) {
+            this.$emit('update:selected', EncodePeriod({period}));
         },
         shouldSeparate(index: number) {
-            const day = this.data[index];
-            return index !== this.data.length
-                && DateParser.ReFormat(day.Date, DateParser.TT_FORMAT, 'dddd') === 'Friday';
+            const day = this.content[index];
+            return index+1 !== this.content.length
+                && DateParser.ReFormat(day[0].Date, DateParser.COMMON_FORMAT, 'dddd') === 'Friday';
         },
         scroller(): HTMLElement {
             return this.$refs.scroller as any;
@@ -146,11 +157,14 @@ export default defineComponent({
             this.checkMore();
         },
         formatDate(date: string): string {
-            return DateParser.ReFormat(date, DateParser.TT_FORMAT, 'dddd, DD MMM')
+            return DateParser.ReFormat(date, DateParser.COMMON_FORMAT, 'dddd, DD MMM')
         },
         updateSize() {
             this.bodyWidth = this.scroller().scrollWidth;
             this.bodyVisible = this.body().clientWidth;
+        },
+        async waitForUpdate() {
+            return PromiseHelpers.WaitUntil(() => this.scroller().scrollWidth !== 0);
         },
         async checkMore() {
             this.updateSize();
@@ -158,7 +172,7 @@ export default defineComponent({
                 if (this.onMore) {
                     await this.onMore()
                 }
-                await PromiseHelpers.WaitUntil(() => this.scroller().scrollWidth !== 0);
+                await this.waitForUpdate();
                 this.updateSize();
             }
         }
@@ -184,7 +198,7 @@ export default defineComponent({
     display: flex;
     font-family: 'Roboto Light', sans-serif;
 
-    .st-vtable__column+.st-vtable__column {
+    .st-vtable__column + .st-vtable__column {
         border-left: @border1;
     }
 

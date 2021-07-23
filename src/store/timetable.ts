@@ -1,37 +1,42 @@
 import {Module} from 'vuex';
-import {TimetableData} from "@/lib/data/timetable";
+import {ConvertData, TimetableData, WebTimetableData} from "@/lib/data/timetable";
 import {NetworkRequest, RequestResponse} from "@/lib/networkRequest";
 import {DateParser} from "@/lib/dates/dateParser";
 
 const TT = 'https://spider.scotscollege.school.nz/Spider2011/Handlers/Timetable.asmx/GetTimeTable_ByStudentMode';
 
-function cleanData({data, date}: {data: TimetableData, date: string}): TimetableData {
+function cleanData({data, date}: { data: WebTimetableData, date: string }): WebTimetableData {
     data = data.filter(d => {
         return DateParser.instance(d.Date, DateParser.TT_FORMAT).isAfter(DateParser.instance(date, DateParser.REQUEST_FORMAT))
     });
     return data;
 }
 
-function addData({data, oldData, date}: {data: TimetableData, oldData: TimetableData, date: string}): TimetableData {
-    const stringed = oldData.map(d => JSON.stringify(d));
-
-    data = cleanData({data, date});
-    for (const day of data) {
-        if (!stringed.includes(JSON.stringify(day))) {
-            oldData.push(day);
-        }
-    }
-
-    // shouldn't need to sort yet
-    return oldData;
-}
+// function addData({data, oldData, date}: {data: WebTimetableData, oldData: WebTimetableData, date: string}): WebTimetableData {
+//     const stringed = oldData.map(d => JSON.stringify(d));
+//
+//     data = cleanData({data, date});
+//     for (const day of data) {
+//         if (!stringed.includes(JSON.stringify(day))) {
+//             oldData.push(day);
+//         }
+//     }
+//
+//     // shouldn't need to sort yet
+//     return oldData;
+// }
 
 export const timetable: Module<any, any> = {
     namespaced: true,
     state: {
-        timetable: [] as TimetableData,
+        timetable: {} as TimetableData,
         error: '' as string,
         isLoading: false
+    },
+    getters: {
+        timetable(state) {
+            return state.timetable;
+        }
     },
     mutations: {
         setIsLoading(state, {isLoading}: { isLoading: boolean }) {
@@ -63,7 +68,7 @@ export const timetable: Module<any, any> = {
                     if (response.ok) {
                         const data = JSON.parse(response.text).d;
                         store.commit('setTimetable', {
-                            data: addData({data, oldData: store.state.timetable, date})
+                            data: {...store.state.timetable, ...ConvertData(cleanData({data, date}))}
                         });
                     }
                     return resolve(true);
@@ -99,7 +104,7 @@ export const timetable: Module<any, any> = {
                     if (response.ok) {
                         const data = JSON.parse(response.text).d;
                         store.commit('setTimetable', {
-                            data: cleanData({data, date})
+                            data: ConvertData(cleanData({data, date}))
                         });
                     } else {
                         store.commit('setError', {
