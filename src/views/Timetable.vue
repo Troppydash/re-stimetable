@@ -2,14 +2,17 @@
     <div class="timetable">
         <!-- Querying -->
         <div class="timetable__filter">
-            <Filterer v-model:filter="filter" :today="today"/>
+            <Filterer v-model:filter="filter"
+                      :today="today"
+                      :data="data"
+                      :is-ok="isOk"/>
         </div>
 
         <!-- Timetable -->
         <div class="timetable__table">
             <DynamicTable :package="package"
                           :on-more="fetchMore"
-                          :on-select="handleSelect"/>
+                          v-model:selected="selected"/>
         </div>
 
         <!-- Map -->
@@ -17,7 +20,7 @@
             <MapCanvas :is-minimized="true"
                        v-model:fs="fs"
                        v-model:closed="closed"
-                       v-model:selected="selectedRoom"/>
+                       :selected="selectedRoom"/>
             <div class="timetable__open-map" v-show="closed">
                 <button @click="openMap"
                         class="st-fab">
@@ -35,7 +38,7 @@ import {DateParser} from "@/lib/dates/dateParser";
 import DynamicTable from "@/components/timetable/DynamicTable.vue";
 import Alert from "@/components/controls/Alerts/Alert.vue";
 import MapCanvas from "@/components/map/MapCanvas.vue";
-import {TimetableDay, WebTimetablePeriod} from "@/lib/data/timetable";
+import {DecodePeriod, TimetableDay, WebTimetablePeriod} from "@/lib/data/timetable";
 import {WebSettings} from "@/lib/settings";
 import Filterer from "@/components/controls/Filter/Filterer.vue";
 
@@ -46,18 +49,27 @@ export default defineComponent({
         const closed = WebSettings.instance.getSetting('map-closed');
         return {
             filter: (a: any) => a,
-            selectedRoom: '',
+            selected: '',
             fs: false,
             closed,
+            isOk: true,
         }
     },
     computed: {
         ...mapState('timetable', ['timetable', 'isLoading', 'error']),
         package() {
             let that = this as any;
+            let data = that.data;
+            try {
+                data = that.filter(data);
+                this.isOk = true;
+            } catch (e) {
+                console.error(e.message);
+                this.isOk = false;
+            }
             return {
                 isLoading: that.isLoading,
-                data: that.filter(that.data),
+                data,
                 error: that.error,
             };
         },
@@ -78,6 +90,9 @@ export default defineComponent({
         },
         today() {
             return DateParser.Today();
+        },
+        selectedRoom() {
+            return DecodePeriod((this as any).selected).room;
         }
     },
     watch: {
@@ -96,12 +111,12 @@ export default defineComponent({
             this.closed = false;
         },
         async fetchTimetable() {
-            // await this.$store.dispatch('timetable/fetchTimetable', {date: DateParser.TodayForRequest()});
+            await this.$store.dispatch('timetable/fetchTimetable', {date: DateParser.TodayForRequest()});
         },
         async fetchMore() {
             const data = this.data;
             const lastDate = DateParser.AddDays(data[data.length - 1][0].Date, DateParser.COMMON_FORMAT, 7, DateParser.REQUEST_FORMAT);
-            // await this.$store.dispatch('timetable/fetchMoreTimetable', {date: lastDate});
+            await this.$store.dispatch('timetable/fetchMoreTimetable', {date: lastDate});
         }
     },
     mounted() {
@@ -119,7 +134,8 @@ export default defineComponent({
 
 
     .timetable__filter {
-        float: right;
+        display: flex;
+        justify-content: flex-end;
         margin-bottom: 2rem;
     }
 

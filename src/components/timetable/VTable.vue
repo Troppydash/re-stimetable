@@ -113,6 +113,7 @@ export default defineComponent({
                 this.scroll(0);
             }
             this.updateSize();
+            await this.checkMore();
         }
     },
     computed: {
@@ -224,7 +225,7 @@ export default defineComponent({
         & > div {
             text-align: left;
             padding: 0.5rem;
-            height: calc((100% - 10%) / 6);
+            height: 80px;
         }
 
         & > div:not(.st-vtable__label) + div:not(.st-vtable__label) {

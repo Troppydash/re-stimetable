@@ -15,7 +15,7 @@ import {defineComponent} from "vue";
 export default defineComponent({
     name: "DynamicTable",
     components: {VTable, List},
-    props: ["package", "onMore", "onSelect", 'selected'],
+    props: ["package", "onMore", 'selected'],
     data() {
         return {
             showList: false,

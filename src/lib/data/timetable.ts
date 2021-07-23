@@ -43,10 +43,24 @@ export interface TimetablePeriod {
     Class: number;
     Room: string;
     Abbrev: string;
-    Desc: string;
+    Desc: string;  // TODO: Fix this because Desc is a keyword
     Date: string;
     Teacher: string;
     TeacherCode: string;
+}
+
+export const EMPTY_PERIOD: TimetablePeriod = {
+    ToTime: '0:00',
+    FromTime: '0:00',
+    TeacherCode: '',
+    Teacher: '',
+    Room: '',
+    Desc: '',
+    Date: '',
+    Class: 0,
+    Abbrev: '',
+    Subject: 0,
+    PeriodID: 0
 }
 
 export interface PeriodDescription {

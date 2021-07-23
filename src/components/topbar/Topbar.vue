@@ -2,20 +2,14 @@
     <div class="bar"></div>
     <div class="topbar">
         <div class="topbar__actions">
-            <div class="st-tooltip st-tooltip--bottom">
-                <span class="st-tooltip__text">View Timetables</span>
-                <router-link to="/timetable"
-                             class="st-text st-text--link st-text--bold">
-                    TIMETABLE
-                </router-link>
-            </div>
-            <div class="st-tooltip st-tooltip--bottom">
-                <span class="st-tooltip__text">View Settings</span>
-                <router-link to="/settings"
-                             class="st-text st-text--link st-text--bold">
-                    SETTINGS
-                </router-link>
-            </div>
+            <router-link to="/timetable"
+                         class="st-text st-text--link st-text--bold">
+                TIMETABLE
+            </router-link>
+            <router-link to="/settings"
+                         class="st-text st-text--link st-text--bold">
+                SETTINGS
+            </router-link>
         </div>
         <div class="topbar__details">
             <span class="st-text">Hello: {{ username }}</span>

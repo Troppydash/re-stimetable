@@ -106,6 +106,7 @@ import {
 } from "@stimetable/map-renderer/lib/features";
 import {ResizeFeature} from "@/lib/features/ResizeFeature";
 
+// TODO: Some room problems
 interface MapSettings {
     quality: 'balanced' | 'power-saving' | 'good' | 'best',
     shadows: 'balanced' | 'power-saving' | 'good' | 'best',
