@@ -343,6 +343,12 @@ export default defineComponent({
                     {
                         method: "onToggleFullscreen",
                         callback: ([isFs]) => {
+                            if (isFs) {
+                                document.querySelector('body')!.style.overflow = 'hidden';
+                            } else {
+                                document.querySelector('body')!.style.overflow = 'initial';
+                            }
+
                             this.isFs = isFs;
                             this.$emit('update:fs', isFs);
                         }
@@ -384,7 +390,7 @@ export default defineComponent({
     position: relative;
 
     &.map-container--fs {
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
         height: 100vh;

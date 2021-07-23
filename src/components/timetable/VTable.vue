@@ -5,12 +5,12 @@
         <div v-else class="st-vtable__header st-vtable__column">
             <!-- This is the top right divider label -->
             <div class="st-vtable__label">
-                <span class="st-text st-text--140">Period \ Date</span>
+                <span class="st-text st-text--110">Period \ Date</span>
             </div>
             <!-- the row labels are here -->
             <div v-for="(period, index) in leftestDay.periodData">
-                <p class="st-text st-text--130">Period {{ index + 1 }}</p>
-                <p class="st-text">From {{ period.FromTime }} To {{ period.ToTime }}</p>
+                <p class="st-text">Period {{ index + 1 }}</p>
+                <p class="st-text st-text--80">From {{ period.FromTime }} To {{ period.ToTime }}</p>
             </div>
         </div>
 
@@ -28,13 +28,13 @@
                      class="st-vtable__column" :class="{'st-vtable__column--friday': shouldSeparate(index)}">
                     <!-- the date -->
                     <div class="st-vtable__label">
-                        <span class="st-text st-text--140">{{ formatDate(day.Date) }}</span>
+                        <span class="st-text st-text--110">{{ formatDate(day.Date) }}</span>
                     </div>
                     <div v-for="(period) in day.periodData"
                          @click="() => handleSelect({day,period})"
                     :class="{'st-vtable--selected': focused && focused === encode({period, day})}">
-                        <p class="st-text st-text--120">{{ period.teacherTimeTable?.Desc }}</p>
-                        <p class="st-text">{{ period.teacherTimeTable?.Teacher }}</p>
+                        <p class="st-text">{{ period.teacherTimeTable?.Desc }}</p>
+                        <p class="st-text st-text--80">{{ period.teacherTimeTable?.Teacher }}</p>
                         <p class="st-text" style="float: right">{{ period.teacherTimeTable?.Room }}</p>
                     </div>
                 </div>
@@ -165,15 +165,17 @@ export default defineComponent({
         cursor: pointer;
 
         .st-vtable__label {
-            background: var(--st-primary-focus);
+            background: var(--st-primary);
             color: var(--st-primary-text);
-            padding: 0.5rem 1rem;
+            padding: 0 0.5rem;
             height: 10%;
+            display: flex;
+            align-items: center;
         }
 
         & > div {
             text-align: left;
-            padding: 0.75rem;
+            padding: 0.5rem;
             height: calc((100% - 10%) / 6);
         }
 

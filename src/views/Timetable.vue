@@ -96,7 +96,7 @@ export default defineComponent({
 .timetable {
     margin: 0 auto;
     padding: 2rem 2rem;
-    width: 90%;
+    width: 95%;
 
 
     .timetable__filter {
