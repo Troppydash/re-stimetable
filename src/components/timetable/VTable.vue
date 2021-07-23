@@ -1,7 +1,20 @@
 <template>
     <div class="st-vtable">
         <!-- first column -->
-        <div v-if="isLoading" class="st-vtable__header"></div>
+
+        <!-- skeleton -->
+        <div v-if="isLoading" class="st-vtable__header st-vtable__column">
+            <!-- This is the top right divider label -->
+            <div class="st-vtable__label">
+                <span class="st-text st-text--110 st-text--skeleton">Period \ Date</span>
+            </div>
+            <!-- the row labels are here -->
+            <div v-for="(index) in Array.from({length: 6})">
+                <p class="st-text st-text--skeleton">Period {{ index + 1 }}</p>
+                <p class="st-text st-text--80 st-text--skeleton">From 9:30 To 10:30</p>
+            </div>
+        </div>
+        <!-- real data -->
         <div v-else class="st-vtable__header st-vtable__column">
             <!-- This is the top right divider label -->
             <div class="st-vtable__label">
@@ -15,15 +28,33 @@
         </div>
 
         <!-- the rest of the data -->
-        <div v-if="isLoading" class="st-vtable__body"></div>
-        <div v-else class="st-vtable__body" id="vtable-body" ref="body">
+
+        <!-- skeleton -->
+        <div v-if="isLoading" class="st-vtable__body" ref="body">
+            <div class="scroller" ref="scroller">
+                <div v-for="index in Array.from({length: 6})"
+                     class="st-vtable__column" :class="{'st-vtable__column--friday': index % 5 === 4}">
+                    <!-- the date -->
+                    <div class="st-vtable__label">
+                        <span class="st-text st-text--110 st-text--skeleton">Monday, 23 August</span>
+                    </div>
+                    <div v-for="(period) in Array.from({length: 6})">
+                        <p class="st-text st-text--skeleton">SL Chemistry</p>
+                        <p class="st-text st-text--80 st-text--skeleton">Mr S A Lawrenson</p>
+                        <p class="st-text st-text--skeleton" style="float: right">R19</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- real data -->
+        <div v-else class="st-vtable__body" ref="body">
             <!-- left scroller-->
             <div v-show="showLeftScroll" @click="() => scroll(-1)"
                  class="st-vtable__scroller">
                 <i class="ri-arrow-left-s-fill"></i>
             </div>
             <!-- columns of each day -->
-            <div class="scroller" id="vtable-body-scroller" ref="scroller">
+            <div class="scroller" ref="scroller">
                 <div v-for="(day, index) in data"
                      class="st-vtable__column" :class="{'st-vtable__column--friday': shouldSeparate(index)}">
                     <!-- the date -->
@@ -32,7 +63,7 @@
                     </div>
                     <div v-for="(period) in day.periodData"
                          @click="() => handleSelect({day,period})"
-                    :class="{'st-vtable--selected': focused && focused === encode({period, day})}">
+                         :class="{'st-vtable--selected': focused && focused === encode({period, day})}">
                         <p class="st-text">{{ period.teacherTimeTable?.Desc }}</p>
                         <p class="st-text st-text--80">{{ period.teacherTimeTable?.Teacher }}</p>
                         <p class="st-text" style="float: right">{{ period.teacherTimeTable?.Room }}</p>
@@ -89,7 +120,7 @@ export default defineComponent({
     },
     methods: {
         encode: EncodePeriod,
-        handleSelect({period, day}: {period: PeriodData, day: TimetableDay}) {
+        handleSelect({period, day}: { period: PeriodData, day: TimetableDay }) {
             if (this.onSelect) {
                 this.onSelect(period);
             }
@@ -122,6 +153,7 @@ export default defineComponent({
             this.bodyVisible = this.body().clientWidth;
         },
         async checkMore() {
+            this.updateSize();
             if (this.bodyWidth - (this.bodyScroll + this.bodyVisible) < COLUMN_WIDTH / 2) {
                 if (this.onMore) {
                     await this.onMore()
@@ -152,6 +184,9 @@ export default defineComponent({
     display: flex;
     font-family: 'Roboto Light', sans-serif;
 
+    .st-vtable__column+.st-vtable__column {
+        border-left: @border1;
+    }
 
     .st-vtable__column {
         flex: 0 0 300px;
@@ -160,7 +195,6 @@ export default defineComponent({
         justify-content: stretch;
         align-items: stretch;
 
-        border-right: @border1;
 
         cursor: pointer;
 
@@ -196,6 +230,7 @@ export default defineComponent({
     .st-vtable__header {
         flex: 0 0 200px;
         cursor: initial;
+        border-right: @border1;
     }
 
     .st-vtable__body {

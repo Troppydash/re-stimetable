@@ -11,13 +11,14 @@ export default {
     data() {
         return {
             data: [],
+            isLoading: true,
         }
     },
     computed: {
         package() {
             return {
                 data: this.data,
-                isLoading: false,
+                isLoading: this.isLoading,
                 error: '',
             }
         }
@@ -25,6 +26,7 @@ export default {
     async mounted() {
         const response = await fetch('/examples/timetable.json');
         this.data = await response.json();
+        this.isLoading = false;
     }
 }
 </script>

@@ -8,13 +8,13 @@
             <p class="st-text">It contains...</p>
         </div>
         <div>
-            <p class="st-text st-text--title">Your Timetable</p>
+            <a class="st-text st-text--title st-text--link">Your Timetable</a>
         </div>
         <div>
             <ExampleTable />
         </div>
         <div>
-            <p class="st-text st-text--title">And A Map</p>
+            <a class="st-text st-text--title st-text--link">And A Map</a>
         </div>
         <div>
             <MapCanvas/>
@@ -66,9 +66,8 @@ export default {
 <style lang="less" scoped>
 
 .showcase {
-    margin: 0 auto;
+    margin: 0 5%;
     padding: 2rem 2rem;
-    width: 70%;
 
     overflow: hidden;
 
@@ -85,6 +84,7 @@ export default {
 @media screen and (max-width: 1024px) {
     .showcase {
         width: 95%;
+        margin: 0 auto;
     }
 }
 

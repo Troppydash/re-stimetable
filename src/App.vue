@@ -32,15 +32,39 @@ body {
 
     margin: 0;
     min-height: 100vh;
+
+    scroll-behavior: smooth;
 }
 
 #app {
     position: relative;
 }
 
-.st-text.st-text--bold {
-    font-family: 'Roboto', sans-serif;
-    font-weight: bold;
+.st-text {
+    &.st-text--bold {
+        font-family: 'Roboto', sans-serif;
+        font-weight: bold;
+    }
+
+    &.st-text--skeleton {
+        opacity: 0.3;
+        width: fit-content;
+        box-sizing: border-box;
+
+        text-indent: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        background: linear-gradient(267deg, var(--st-text-dim), var(--st-text));
+        background-size: 400% 400%;
+
+        animation: Flash 2s ease infinite;
+
+        @keyframes Flash {
+            0%{background-position:0% 50%}
+            50%{background-position:100% 50%}
+            100%{background-position:0% 50%}
+        }
+    }
 }
 
 @import "css/shadow";
