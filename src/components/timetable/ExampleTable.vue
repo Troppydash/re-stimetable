@@ -4,6 +4,7 @@
 
 <script>
 import DynamicTable from "./DynamicTable";
+import {TimetableHelpers} from "@/lib/data/timetable";
 
 export default {
     name: "ExampleTable",
@@ -17,7 +18,7 @@ export default {
     computed: {
         package() {
             return {
-                data: this.data,
+                data: TimetableHelpers.ToSortedDays(this.data),
                 isLoading: this.isLoading,
                 error: '',
             }
@@ -25,7 +26,7 @@ export default {
     },
     async mounted() {
         const response = await fetch('/examples/timetable.json');
-        this.data = await response.json();
+        this.data = TimetableHelpers.FromWebData(await response.json());
         this.isLoading = false;
     }
 }

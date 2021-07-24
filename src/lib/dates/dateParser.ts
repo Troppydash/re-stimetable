@@ -6,7 +6,7 @@ export namespace DateParser {
     export const REQUEST_FORMAT = 'DD-MM-YYYY';
     export const TT_FORMAT = 'DD/MM/YYYY HH:mm:ss';
 
-    export const COMMON_FORMAT = 'DD/MM/YYYY';
+    export const COMMON_FORMAT = 'YYYY-MM-DD';
 
     export const instance = dayjs;
 
@@ -27,7 +27,7 @@ export namespace DateParser {
     }
 
     export function TodayForRequest(): string {
-        return dayjs().format('DD-MM-YYYY');
+        return dayjs().format(REQUEST_FORMAT);
     }
 
     export function Today(): string {

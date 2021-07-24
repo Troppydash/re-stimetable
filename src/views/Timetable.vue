@@ -38,7 +38,7 @@ import {DateParser} from "@/lib/dates/dateParser";
 import DynamicTable from "@/components/timetable/DynamicTable.vue";
 import Alert from "@/components/controls/Alerts/Alert.vue";
 import MapCanvas from "@/components/map/MapCanvas.vue";
-import {DecodePeriod, TimetableDay, WebTimetablePeriod} from "@/lib/data/timetable";
+import {TimetableDay, TimetableHelpers, WebTimetablePeriod} from "@/lib/data/timetable";
 import {WebSettings} from "@/lib/settings";
 import Filterer from "@/components/controls/Filter/Filterer.vue";
 
@@ -73,26 +73,14 @@ export default defineComponent({
                 error: that.error,
             };
         },
-        data(): TimetableDay[] {
-            // just trust me buddy
-            // @ts-ignore
-            return Object.values(this.timetable).sort((left: TimetableDay, right: TimetableDay) => {
-                const ld = left[0].Date;
-                const rd = right[0].Date;
-                if (ld === rd) {
-                    return 0;
-                }
-                if (DateParser.IsBefore(ld, rd)) {
-                    return -1;
-                }
-                return 1;
-            });
-        },
         today() {
             return DateParser.Today();
         },
         selectedRoom() {
-            return DecodePeriod((this as any).selected).room;
+            return TimetableHelpers.DecodePeriod((this as any).selected).room;
+        },
+        data() {
+            return TimetableHelpers.ToSortedDays((this as any).timetable);
         }
     },
     watch: {
@@ -114,6 +102,7 @@ export default defineComponent({
             await this.$store.dispatch('timetable/fetchTimetable', {date: DateParser.TodayForRequest()});
         },
         async fetchMore() {
+            // TODO: Rewrite this so no infinite requests,
             const data = this.data;
             const lastDate = DateParser.AddDays(data[data.length - 1][0].Date, DateParser.COMMON_FORMAT, 7, DateParser.REQUEST_FORMAT);
             await this.$store.dispatch('timetable/fetchMoreTimetable', {date: lastDate});

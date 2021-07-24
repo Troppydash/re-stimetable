@@ -64,7 +64,7 @@
                     <div v-for="(period) in day"
                          @click="() => handleSelect(period)"
                          :class="{'st-vtable--selected': selected && selected === encode({period})}">
-                        <p class="st-text">{{ period.Desc }}</p>
+                        <p class="st-text">{{ period.Subject }}</p>
                         <p class="st-text st-text--80">{{ period.Teacher }}</p>
                         <p class="st-text" style="float: right">{{ period.Room }}</p>
                     </div>
@@ -82,11 +82,7 @@
 <script lang="ts">
 import {defineComponent} from 'vue';
 import {
-    EncodePeriod,
-    WebTimetablePeriod,
-    WebTimetableData,
-    WebTimetableDay,
-    TimetablePeriod, TimetableData, TimetableDay
+    TimetablePeriod, TimetableData, TimetableDay, TimetableHelpers
 } from "@/lib/data/timetable";
 import {DateParser} from "@/lib/dates/dateParser";
 import {PromiseHelpers} from "@/lib/promise/common";
@@ -101,8 +97,6 @@ export default defineComponent({
             bodyWidth: 0,
             bodyVisible: 0,
             bodyScroll: 0,
-            vtableBody: null as unknown as HTMLElement,
-            vtableBodyScroller: null as unknown as HTMLElement,
         };
     },
     watch: {
@@ -134,9 +128,9 @@ export default defineComponent({
         }
     },
     methods: {
-        encode: EncodePeriod,
+        encode: TimetableHelpers.EncodePeriod,
         handleSelect(period: TimetablePeriod) {
-            this.$emit('update:selected', EncodePeriod({period}));
+            this.$emit('update:selected', TimetableHelpers.EncodePeriod({period}));
         },
         shouldSeparate(index: number) {
             const day = this.content[index];

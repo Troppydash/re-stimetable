@@ -1,5 +1,5 @@
 import {Module} from 'vuex';
-import {ConvertData, TimetableData, WebTimetableData} from "@/lib/data/timetable";
+import {TimetableData, TimetableHelpers, WebTimetableData} from "@/lib/data/timetable";
 import {NetworkRequest, RequestResponse} from "@/lib/networkRequest";
 import {DateParser} from "@/lib/dates/dateParser";
 
@@ -11,20 +11,6 @@ function cleanData({data, date}: { data: WebTimetableData, date: string }): WebT
     });
     return data;
 }
-
-// function addData({data, oldData, date}: {data: WebTimetableData, oldData: WebTimetableData, date: string}): WebTimetableData {
-//     const stringed = oldData.map(d => JSON.stringify(d));
-//
-//     data = cleanData({data, date});
-//     for (const day of data) {
-//         if (!stringed.includes(JSON.stringify(day))) {
-//             oldData.push(day);
-//         }
-//     }
-//
-//     // shouldn't need to sort yet
-//     return oldData;
-// }
 
 export const timetable: Module<any, any> = {
     namespaced: true,
@@ -68,7 +54,7 @@ export const timetable: Module<any, any> = {
                     if (response.ok) {
                         const data = JSON.parse(response.text).d;
                         store.commit('setTimetable', {
-                            data: {...store.state.timetable, ...ConvertData(cleanData({data, date}))}
+                            data: {...store.state.timetable, ...TimetableHelpers.FromWebData(cleanData({data, date}))}
                         });
                     }
                     return resolve(true);
@@ -104,7 +90,7 @@ export const timetable: Module<any, any> = {
                     if (response.ok) {
                         const data = JSON.parse(response.text).d;
                         store.commit('setTimetable', {
-                            data: ConvertData(cleanData({data, date}))
+                            data: TimetableHelpers.FromWebData(cleanData({data, date}))
                         });
                     } else {
                         store.commit('setError', {

@@ -7,7 +7,7 @@
                        v-model="query"
                        ref="input"
                        placeholder="where Room = ..."
-                       @focus="onInputFI" @blur="onInputFO"
+                       @focus="() => onInputFocus(true)" @blur="() => onInputFocus(false)"
                        @keydown="onKey"
                        @click="updateCount">
                 <i :class="[{'ri-error-warning-line': !(isOk && isValid) }, 'ri-check-line']"></i>
@@ -19,9 +19,13 @@
         </div>
 
         <div class="filterer__ac"
-             v-if="inputFocused"
-             :style="{left: `${leftWords}ch`}">
+             v-show="acFocused || inputFocused"
+             :style="{left: `${leftWords}ch`}"
+             @focus="() => onAcFocus(true)"
+             tabindex="-1">
             <div v-for="(text, index) in ac"
+                 @click="acceptAC"
+                 @mouseover="() => selectAC(index)"
                  :class="{'filterer__ac--selected': selectedAC === index}">
                 {{ text.trimEnd() }}
             </div>
@@ -82,12 +86,14 @@ export default defineComponent({
             query: '',
             filterer: new DataFilterer(),
             inputFocused: false,
-            showInfo: false,
+
 
             // tabs
+            showInfo: false,
             selectedTab: 0,
 
             // autocomplete
+            acFocused: false,
             leftWords: 0,
             selectedAC: 0,
         };
@@ -179,7 +185,7 @@ export default defineComponent({
                     }
                 },
                 {
-                    match: /\s(\w+)\s+=\s+([^\s]*)/g,  // equality helpers
+                    match: /\s(\w+)\s+=\s+("[^"]*|[^\s]*)/g,  // equality helpers
                     priority: 1,
                     suggestions: (matched: string, groups: string[]) => {
                         const [key, word] = groups;
@@ -249,8 +255,8 @@ export default defineComponent({
             return (this as any).$refs.input;
         },
         width(): string {
-            if (this.query.length < 30) {
-                return '500px';
+            if (this.query.length < 40) {
+                return '600px';
             } else if (this.query.length < 70) {
                 return '1000px';
             }
@@ -259,13 +265,17 @@ export default defineComponent({
     },
     methods: {
         // ridiculous code for a simple dialog
-        onInputFI() {
-            this.inputFocused = true;
+        onInputFocus(focus: boolean) {
+            if (!focus) {
+                setTimeout(() => {
+                    this.inputFocused = focus;
+                }, 10);
+                return;
+            }
+            this.inputFocused = focus;
         },
-        onInputFO() {
-            setTimeout(() => {
-                this.inputFocused = false;
-            }, 100);
+        onAcFocus(focus: boolean) {
+            this.acFocused = focus;
         },
         toggleInfo() {
             this.showInfo = !this.showInfo;
@@ -302,16 +312,37 @@ export default defineComponent({
                 this.leftWords = this.input.selectionStart;
             }, 100);  // evil delay because dom doesn't update in time
         },
+        selectAC(index: number) {
+            this.selectedAC = index;
+        },
         acceptAC() {
             if (this.ac.length === 0)
                 return;
             const word = this.ac[this.selectedAC];
             const position = this.leftWords;
 
-            const before = this.query.slice(0, position).split(' ');
-            before[before.length - 1] = '';
-            this.query = [before.join(' '), word, this.query.slice(position)].join('');
+            const before = this.query.slice(0, position);
+            const matched = word;
+            let left = before;
+
+            if (before.length !== 0) {
+                for (let i = matched.length - 1; i >= 0; i--) {
+                    if (matched[i] === before[before.length - 1]) {
+                        // found a common letter
+                        if (before.endsWith(matched.slice(0, i + 1))) {
+                            left = before.slice(0, before.length - i - 1);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            this.query = [left, word, this.query.slice(position)].join('');
             this.input.setSelectionRange(position + word.length, position + word.length);
+            this.input.focus();
+            this.inputFocused = true;
+            this.acFocused = false;
+            this.updateCount();
         }
     },
     mounted() {
@@ -337,9 +368,9 @@ export default defineComponent({
             padding: 0.25rem 0.5rem;
             background: #ffffff;
             color: black;
+            cursor: default;
 
-            &.filterer__ac--selected,
-            &:hover {
+            &.filterer__ac--selected {
                 background: #0b53bf;
                 color: white;
             }

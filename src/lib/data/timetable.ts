@@ -39,28 +39,24 @@ export interface TimetablePeriod {
     PeriodID: number;
     FromTime: string;
     ToTime: string;
-    Subject: number;
+    Subject: string;
     Class: number;
     Room: string;
     Abbrev: string;
-    Desc: string;  // TODO: Fix this because Desc is a keyword
     Date: string;
     Teacher: string;
-    TeacherCode: string;
 }
 
 export const EMPTY_PERIOD: TimetablePeriod = {
     ToTime: '0:00',
     FromTime: '0:00',
-    TeacherCode: '',
-    Teacher: '',
-    Room: '',
-    Desc: '',
-    Date: '',
-    Class: 0,
+    PeriodID: 0,
+    Subject: '',
     Abbrev: '',
-    Subject: 0,
-    PeriodID: 0
+    Class: 0,
+    Date: '',
+    Room: '',
+    Teacher: '',
 }
 
 export interface PeriodDescription {
@@ -104,8 +100,8 @@ export const PERIOD_DESCRIPTION: Partial<Record<keyof TimetablePeriod, PeriodDes
             format: '[code]'
         }
     },
-    Desc: {
-        inShort: 'A Description of the Class as a Subject',
+    Subject: {
+        inShort: 'The Subject of the Period',
         spec: {
             type: 'string',
             examples: ['Economics', 'SL Chemistry', 'English'],
@@ -113,7 +109,7 @@ export const PERIOD_DESCRIPTION: Partial<Record<keyof TimetablePeriod, PeriodDes
         }
     },
     Date: {
-        inShort: 'The Day of this Period',
+        inShort: 'The Date of this Period',
         spec: {
             type: 'string',
             examples: ['21/09/2021', '01/07/2022', '15/02/2019'],
@@ -127,40 +123,61 @@ export const PERIOD_DESCRIPTION: Partial<Record<keyof TimetablePeriod, PeriodDes
             examples: ['Ms Y A Do', 'Mr W P Jeffery'],
             format: '[m] [f-name] [m-name] [lastname]'
         }
+    },
+    Class: {
+        inShort: 'The Unique Class ID of the Period',
+        spec: {
+            type: 'number',
+            examples: ['72', '51', '233'],
+            format: '[id]'
+        }
     }
 };
 
-export function ConvertData(data: WebTimetableData): TimetableData {
-    const out: TimetableData = {};
-    for (const day of data) {
-        const date = DateParser.ToCommonFormat(day.Date, DateParser.TT_FORMAT);
-        out[date]
-            = day.periodData.map(period => ({
-            PeriodID: +period.PeriodID,
-            FromTime: period.FromTime,
-            ToTime: period.ToTime,
-            Subject: +period.teacherTimeTable?.Subject ?? 0,
-            Abbrev: period.teacherTimeTable?.Abbrev ?? '',
-            Class: +period.teacherTimeTable?.Class ?? 0,
-            Date: date,
-            Desc: period.teacherTimeTable?.Desc ?? '',
-            Room: period.teacherTimeTable?.Room ?? '',
-            Teacher: period.teacherTimeTable?.Teacher ?? '',
-            TeacherCode: period.teacherTimeTable?.TeacherCode ?? ''
-        }));
+export namespace TimetableHelpers {
+    export function FromWebData(data: WebTimetableData): TimetableData {
+        const out: TimetableData = {};
+        for (const day of data) {
+            const date = DateParser.ToCommonFormat(day.Date, DateParser.TT_FORMAT);
+            out[date]
+                = day.periodData.map(period => ({
+                PeriodID: +period.PeriodID,
+                FromTime: period.FromTime,
+                ToTime: period.ToTime,
+                Subject: period.teacherTimeTable?.Desc ?? '',
+                Abbrev: period.teacherTimeTable?.Abbrev ?? '',
+                Class: +period.teacherTimeTable?.Class || 0,
+                Date: date,
+                Room: period.teacherTimeTable?.Room ?? '',
+                Teacher: period.teacherTimeTable?.Teacher ?? '',
+            }));
+        }
+        return out;
     }
-    return out;
-}
+    export function ToSortedDays(data: TimetableData): TimetableDay[] {
+        return Object.values(data).sort((left: TimetableDay, right: TimetableDay) => {
+            const ld = left[0].Date;
+            const rd = right[0].Date;
+            if (ld === rd) {
+                return 0;
+            }
+            if (DateParser.IsBefore(ld, rd)) {
+                return -1;
+            }
+            return 1;
+        });
+    }
+    export function EncodePeriod({period}: { period: TimetablePeriod }): string {
+        return `${period.Date}|${period.PeriodID}|${period.Room}`;
+    }
 
-export function EncodePeriod({period}: { period: TimetablePeriod }): string {
-    return `${period.Date}|${period.PeriodID}|${period.Room}`;
-}
+    export function DecodePeriod(encoded: string): { date: string, periodID: string, room: string } {
+        const [date, periodID, room] = encoded.split('|');
+        return {
+            date,
+            periodID,
+            room
+        };
+    }
 
-export function DecodePeriod(encoded: string): { date: string, periodID: string, room: string } {
-    const [date, periodID, room] = encoded.split('|');
-    return {
-        date,
-        periodID,
-        room
-    };
 }

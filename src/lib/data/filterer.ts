@@ -39,7 +39,7 @@ export class DataFilterer {
                             case '<':
                                 return left < right;
                             case '>':
-                                return right > left;
+                                return left > right;
                             case '=':
                                 return left == right;
                         }
@@ -84,7 +84,13 @@ export class DataFilterer {
                             any = true;
                             remain.push(period);
                         } else {
-                            remain.push({...EMPTY_PERIOD, Date: period.Date, PeriodID: period.PeriodID});
+                            remain.push({
+                                ...EMPTY_PERIOD,
+                                Date: period.Date,
+                                PeriodID: period.PeriodID,
+                                FromTime: period.FromTime,
+                                ToTime: period.ToTime,
+                            });
                         }
                     }
                     if (any) {
