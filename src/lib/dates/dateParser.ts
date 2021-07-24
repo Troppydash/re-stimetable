@@ -37,4 +37,7 @@ export namespace DateParser {
         return dayjs().format(COMMON_FORMAT);
     }
 
+    export function IsValid(day: string): boolean {
+        return dayjs(day, COMMON_FORMAT).isValid();
+    }
 }

@@ -3,9 +3,10 @@
         <!-- Querying -->
         <div class="timetable__filter">
             <Filterer v-model:filter="filter"
-                      :today="today"
                       :data="data"
-                      :is-ok="isOk"/>
+                      :is-ok="isOk"
+                      v-model:today="today"
+                      :status="{package}"/>
         </div>
 
         <!-- Timetable -->
@@ -43,7 +44,7 @@ import {WebSettings} from "@/lib/settings";
 import Filterer from "@/components/controls/Filter/Filterer.vue";
 
 const BASE_DATE = DateParser.Today();
-const MAX_DAYS = 150;
+const MAX_DAYS = 200;
 const DATE_MAX = DateParser.AddDays(BASE_DATE, MAX_DAYS);
 
 export default defineComponent({
@@ -58,7 +59,9 @@ export default defineComponent({
             closed,
             isOk: true,
 
+            today: DateParser.Today(),
             nextDate: DateParser.Today(),
+            dateMax: DateParser.AddDays(DateParser.Today(), MAX_DAYS)
         }
     },
     computed: {
@@ -79,9 +82,6 @@ export default defineComponent({
                 error: that.error,
             };
         },
-        today() {
-            return DateParser.Today();
-        },
         selectedRoom() {
             return TimetableHelpers.DecodePeriod((this as any).selected).room;
         },
@@ -90,6 +90,11 @@ export default defineComponent({
         }
     },
     watch: {
+        today() {
+            this.nextDate = this.today;
+            this.dateMax = DateParser.AddDays(this.today, MAX_DAYS);
+            this.fetchTimetable();
+        },
         closed(isClosed: boolean) {
             WebSettings.instance.setSetting('map-closed', isClosed);
         }
@@ -106,9 +111,11 @@ export default defineComponent({
         },
         adjustNextDate() {
             const data = this.data;
-            const ttNextDate = data[data.length - 1][0].Date;
-            if (DateParser.IsBefore(this.nextDate, ttNextDate)) {
-                this.nextDate = ttNextDate;
+            if (data.length > 0) {
+                const ttNextDate = data[data.length - 1][0].Date;
+                if (DateParser.IsBefore(this.nextDate, ttNextDate)) {
+                    this.nextDate = ttNextDate;
+                }
             }
             this.nextDate = DateParser.AddDays(this.nextDate, 7);
         },

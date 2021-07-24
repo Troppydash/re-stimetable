@@ -3,7 +3,7 @@
         <!-- first column -->
 
         <!-- skeleton -->
-        <div v-if="isLoading" class="st-vtable__header st-vtable__column">
+        <div v-if="isLoading || isEmpty" class="st-vtable__header st-vtable__column">
             <!-- This is the top right divider label -->
             <div class="st-vtable__label">
                 <span class="st-text st-text--110 st-text--skeleton">Period \ Date</span>
@@ -30,7 +30,7 @@
         <!-- the rest of the data -->
 
         <!-- skeleton -->
-        <div v-if="isLoading" class="st-vtable__body" ref="body">
+        <div v-if="isLoading || isEmpty" class="st-vtable__body" ref="body">
             <div class="scroller" ref="scroller">
                 <div v-for="index in Array.from({length: 6})"
                      class="st-vtable__column" :class="{'st-vtable__column--friday': index % 5 === 4}">
@@ -82,7 +82,7 @@
 <script lang="ts">
 import {defineComponent} from 'vue';
 import {
-    TimetablePeriod, TimetableData, TimetableDay, TimetableHelpers
+    TimetablePeriod, TimetableDay, TimetableHelpers
 } from "@/lib/data/timetable";
 import {DateParser} from "@/lib/dates/dateParser";
 import {PromiseHelpers} from "@/lib/promise/common";
@@ -125,6 +125,9 @@ export default defineComponent({
                 return [] as any;
             }
             return this.content[~~(this.bodyScroll / COLUMN_WIDTH)];
+        },
+        isEmpty() {
+            return this.leftestDay.length === 0;
         }
     },
     methods: {

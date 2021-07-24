@@ -9,6 +9,7 @@
         </div>
         <div>
             <a class="st-text st-text--title st-text--link">Your Timetable</a>
+            <p class="st-text st-text--90">-- note that this is not your actual timetable</p>
         </div>
         <div>
             <ExampleTable />

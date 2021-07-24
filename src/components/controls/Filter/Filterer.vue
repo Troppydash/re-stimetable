@@ -12,10 +12,10 @@
                        @click="updateCount">
                 <i :class="[{'ri-error-warning-line': !(isOk && isValid) }, 'ri-check-line']"></i>
             </div>
-            <button class="st-button"
-                    style="height: 3rem;"
-                    @click="toggleInfo">{{ today }}
-            </button>
+            <input class="st-button"
+                   size="6"
+                   style="height: 3rem;"
+                   @click="toggleInfo" v-model="_today"/>
         </div>
 
         <div class="filterer__ac"
@@ -33,29 +33,35 @@
 
         <div v-show="showInfo"
              class="filterer__info">
-            <div class="filterer__tabs">
-                <div v-for="(tab, index) in tabs"
-                     @click="() => handleClick(index)"
-                     class="filterer__tab"
-                     :class="{'filterer__tab--selected':  tabs[selectedTab] === tab }">
-                    <span class="st-text">{{ tab }}</span>
+            <div class="filterer__content">
+                <div class="filterer__tabs">
+                    <div v-for="(tab, index) in tabs"
+                         @click="() => handleClick(index)"
+                         class="filterer__tab"
+                         :class="{'filterer__tab--selected':  tabs[selectedTab] === tab }">
+                        <span class="st-text">{{ tab }}</span>
+                    </div>
+                </div>
+                <div class="filterer__body">
+                    <p class="st-text st-text--170">{{ tabs[selectedTab] }}</p>
+                    <hr/>
+                    <p class="st-text">{{ info.inShort }}</p>
+                    <br/>
+                    <br/>
+                    <p class="st-text">Specification</p>
+                    <table class="st-table st-table--small st-table--full">
+                        <tbody style="font-family: 'Fira Code', monospace">
+                        <tr v-for="([key, value]) in Object.entries(info.spec)">
+                            <td style="width: 100px">{{ key }}</td>
+                            <td>{{ value }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div class="filterer__body">
-                <p class="st-text st-text--170">{{ tabs[selectedTab] }}</p>
-                <hr/>
-                <p class="st-text">{{ info.inShort }}</p>
-                <br/>
-                <br/>
-                <p class="st-text">Specification</p>
-                <table class="st-table st-table--small st-table--full">
-                    <tbody style="font-family: 'Fira Code', monospace">
-                    <tr v-for="([key, value]) in Object.entries(info.spec)">
-                        <td style="width: 100px">{{ key }}</td>
-                        <td>{{ value }}</td>
-                    </tr>
-                    </tbody>
-                </table>
+            <div class="filterer__footer">
+                <span class="st-text st-text--80">{{ filterInfo.columns }} columns</span>
+                <span class="st-text st-text--80">{{ filterInfo.total }} total</span>
             </div>
         </div>
     </div>
@@ -66,6 +72,7 @@ import {defineComponent} from "vue";
 import {PromiseHelpers} from "@/lib/promise/common";
 import {DataFilterer} from "@/lib/data/filterer";
 import {PERIOD_DESCRIPTION, PeriodDescription, TimetablePeriod} from "@/lib/data/timetable";
+import {DateParser} from "@/lib/dates/dateParser";
 
 interface AutoCompleteMatcher {
     match: RegExp;
@@ -85,7 +92,7 @@ function matchRemains(suggestions: string[], word: string | undefined, trailing:
 
 export default defineComponent({
     name: "Filterer",
-    props: ['filter', 'today', 'data', 'isOk'],
+    props: ['filter', 'data', 'isOk', 'status', 'today'],
     data() {
         return {
             isValid: true,
@@ -102,9 +109,16 @@ export default defineComponent({
             acFocused: false,
             leftWords: 0,
             selectedAC: 0,
+
+            _today: this.today
         };
     },
     watch: {
+        _today(newValue: string) {
+            if (DateParser.IsValid(newValue)) {
+                this.$emit('update:today', newValue);
+            }
+        },
         query: PromiseHelpers.Debounce(function (this: any, newQuery: string) {
             try {
                 const filter = this.filterer.getFilter('select * from timetable ' + newQuery);
@@ -122,6 +136,13 @@ export default defineComponent({
         }
     },
     computed: {
+        filterInfo(): any {
+            const data = this.status.package.data;
+            return {
+                columns: data.length,
+                total: data.flat().length
+            };
+        },
         ac(): string[] {
             const suggestions = [];
 
@@ -410,37 +431,56 @@ export default defineComponent({
         width: 100%;
 
         background: var(--st-background);
-        opacity: 1;
-
-        display: flex;
 
         border: 1px solid var(--st-secondary);
 
-        .filterer__tabs {
-            overflow-y: auto;
-            flex: 0 0 200px;
-            border-right: 1px solid var(--st-secondary);
+        .filterer__content {
+            display: flex;
 
-            .filterer__tab {
-                padding: 1rem;
+            .filterer__tabs {
+                overflow-y: auto;
+                flex: 0 0 200px;
+                border-right: 1px solid var(--st-secondary);
 
-                &--selected {
-                    background: var(--st-background-focus) !important;
+                .filterer__tab {
+                    padding: 0.5rem;
+
+                    &--selected {
+                        background: var(--st-background-hover) !important;
+                    }
+
+                    &:hover {
+                        background: var(--st-background-hover);
+                    }
                 }
 
-                &:hover {
-                    background: var(--st-background-hover);
+                & > div + div {
+                    border-top: 1px solid var(--st-secondary);
                 }
             }
 
-            & > div + div {
-                border-top: 1px solid var(--st-secondary);
+            .filterer__body {
+                flex: 1 1;
+                padding: 0.75rem 1rem;
             }
         }
 
-        .filterer__body {
-            flex: 1 1;
-            padding: 0.75rem 1rem;
+
+        .filterer__footer {
+            display: flex;
+            align-content: center;
+            justify-content: flex-end;
+
+            background: var(--st-background-focus);
+            padding: 0.1rem;
+
+            & > * {
+                padding: 0 0.4rem;
+            }
+
+            & > * + * {
+                border-left: 1px solid var(--st-text);
+            }
         }
     }
 }

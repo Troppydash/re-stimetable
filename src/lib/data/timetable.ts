@@ -144,7 +144,7 @@ export namespace TimetableHelpers {
                 PeriodID: +period.PeriodID,
                 FromTime: DateParser.ReFormat(period.FromTime, DateParser.TT_TIME, DateParser.COMMON_TIME),
                 ToTime: DateParser.ReFormat(period.ToTime, DateParser.TT_TIME, DateParser.COMMON_TIME),
-                Subject: period.teacherTimeTable?.Desc ?? '',
+                Subject: period.teacherTimeTable?.Desc ?? period.Heading,
                 Abbrev: period.teacherTimeTable?.Abbrev ?? '',
                 Class: +period.teacherTimeTable?.Class || 0,
                 Date: date,
