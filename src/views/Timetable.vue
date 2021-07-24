@@ -38,9 +38,13 @@ import {DateParser} from "@/lib/dates/dateParser";
 import DynamicTable from "@/components/timetable/DynamicTable.vue";
 import Alert from "@/components/controls/Alerts/Alert.vue";
 import MapCanvas from "@/components/map/MapCanvas.vue";
-import {TimetableDay, TimetableHelpers, WebTimetablePeriod} from "@/lib/data/timetable";
+import {TimetableHelpers, WebTimetablePeriod} from "@/lib/data/timetable";
 import {WebSettings} from "@/lib/settings";
 import Filterer from "@/components/controls/Filter/Filterer.vue";
+
+const BASE_DATE = DateParser.Today();
+const MAX_DAYS = 150;
+const DATE_MAX = DateParser.AddDays(BASE_DATE, MAX_DAYS);
 
 export default defineComponent({
     name: "Timetable",
@@ -53,6 +57,8 @@ export default defineComponent({
             fs: false,
             closed,
             isOk: true,
+
+            nextDate: DateParser.Today(),
         }
     },
     computed: {
@@ -98,14 +104,25 @@ export default defineComponent({
         openMap() {
             this.closed = false;
         },
+        adjustNextDate() {
+            const data = this.data;
+            const ttNextDate = data[data.length - 1][0].Date;
+            if (DateParser.IsBefore(this.nextDate, ttNextDate)) {
+                this.nextDate = ttNextDate;
+            }
+            this.nextDate = DateParser.AddDays(this.nextDate, 7);
+        },
         async fetchTimetable() {
-            await this.$store.dispatch('timetable/fetchTimetable', {date: DateParser.TodayForRequest()});
+            await this.$store.dispatch('timetable/fetchTimetable', {date: this.nextDate});
+            this.adjustNextDate();
         },
         async fetchMore() {
-            // TODO: Rewrite this so no infinite requests,
-            const data = this.data;
-            const lastDate = DateParser.AddDays(data[data.length - 1][0].Date, DateParser.COMMON_FORMAT, 7, DateParser.REQUEST_FORMAT);
-            await this.$store.dispatch('timetable/fetchMoreTimetable', {date: lastDate});
+            if (DateParser.IsBefore(this.nextDate, DATE_MAX)) {
+                await this.$store.dispatch('timetable/fetchMoreTimetable', {
+                    date: this.nextDate
+                });
+                this.adjustNextDate();
+            }
         }
     },
     mounted() {

@@ -77,6 +77,12 @@ interface AutoCompleteInfo {
     equality: Record<keyof TimetablePeriod, Set<any>>;
 }
 
+function matchRemains(suggestions: string[], word: string | undefined, trailing: string = ' ') {
+    return suggestions.filter(item => {
+        return word === undefined || item.startsWith(word) && item !== word;
+    }).map(item => item + trailing);
+}
+
 export default defineComponent({
     name: "Filterer",
     props: ['filter', 'today', 'data', 'isOk'],
@@ -154,54 +160,49 @@ export default defineComponent({
                     priority: 1,
                     suggestions(matched: string, groups: string[]) {
                         const [word] = groups;
-                        if (word === 'where')
-                            return [];
-                        if ('where'.startsWith(word)) {
-                            return ['where '];
-                        }
-                        return [];
+                        return matchRemains(['where'], word);
                     }
                 },
                 {
-                    match: /(\w+)\s(\W+|in)\s+("[^"]*"|[^\s]+)\s/g,  // keywords for spaces around an expression
+                    match: /(where|and|or)\s*( not)?\s+(\w+)\s+([^\s])*/g,
+                    priority: 1,
+                    suggestions(matched: string, groups: string[]) {
+                        const [kw, op, not, word] = groups;
+                        return matchRemains(['=', '!=', '>', '>=', '<', '<=', 'in'], word)
+                    }
+                },
+                {
+                    match: /(\w+)\s(\W+|in)\s+("[^"]*"|[^\s]+)\s+(\w*)/g,  // keywords for spaces around an expression
                     priority: 0,
-                    suggestions() {
-                        return ['and ', 'or ', 'not '];
+                    suggestions(matched: string, groups: string[]) {
+                        const [item, kw, value, word] = groups;
+                        return matchRemains(['and', 'or'], word);
                     }
                 },
                 {
-                    match: /(^where|and|or|not)\s+(\w*)/g,  // adds fields for causes
+                    match: /(where|and|or)\s*( not)?\s+(\w*)/g,  // adds fields for causes
                     priority: 1,
                     suggestions: (matched: string, groups: string[]) => {
-                        const [kw, typed] = groups;
-                        return Object.keys(this.dataInfo.equality)
-                            .filter(key => {
-                                if (!typed)
-                                    return true;
-                                if (key === typed)
-                                    return false;
-                                return key.startsWith(typed);
-                            }).map(item => item + ' ');
+                        const [kw, not, typed] = groups;
+                        return matchRemains(Object.keys(this.dataInfo.equality), typed);
                     }
                 },
                 {
-                    match: /\s(\w+)\s+=\s+("[^"]*|[^\s]*)/g,  // equality helpers
+                    match: /\s*(not)?\s+(\w+)\s+(>|>=|<|<=|=|!=)\s+("[^"]*|[^\s]*)/g,  // equality helpers
                     priority: 1,
                     suggestions: (matched: string, groups: string[]) => {
-                        const [key, word] = groups;
+                        const [not, key, op, word] = groups;
                         const items = this.dataInfo.equality[key as keyof TimetablePeriod];
                         if (!items) {
                             return [];
                         }
 
-                        return Array.from(items).map((item: any) => {
+                        return matchRemains(Array.from(items).map((item: any) => {
                             if (typeof item === 'string') {
                                 return `"${item}"`;
                             }
                             return '' + item;
-                        }).filter((item: string) => {
-                            return item.startsWith(word) && item !== word;
-                        }).map((item: string) => item + ' ');
+                        }), word);
                     }
                 },
                 {
@@ -213,14 +214,19 @@ export default defineComponent({
                         if (!items) {
                             return [];
                         }
-                        return Array.from(items).map((item: any) => {
+                        return matchRemains(Array.from(items).map((item: any) => {
                             if (typeof item === 'string') {
                                 return `"${item}"`;
                             }
                             return '' + item + '';
-                        }).filter((item: string) => {
-                            return (item.startsWith(word) && item !== word) || word === undefined;
-                        }).map((item: string) => item + ', ');
+                        }), word, ', ');
+                    }
+                },
+                {
+                    match: /\sin\s+/g,
+                    priority: 1,
+                    suggestions(matched, groups: string[]) {
+                        return ['( '];
                     }
                 }
             ];

@@ -8,6 +8,9 @@ export namespace DateParser {
 
     export const COMMON_FORMAT = 'YYYY-MM-DD';
 
+    export const COMMON_TIME = 'HH:mm';
+    export const TT_TIME = 'hh:mm';
+
     export const instance = dayjs;
 
     export function ToCommonFormat(source: string, format: string): string {
@@ -18,8 +21,8 @@ export namespace DateParser {
         return dayjs(source, format).format(newFormat);
     }
 
-    export function AddDays(source: string, format: string, days: number, newFormat: string): string {
-        return dayjs(source, format).add(days, 'days').format(newFormat);
+    export function AddDays(source: string, days: number,): string {
+        return dayjs(source, COMMON_FORMAT).add(days, 'days').format(COMMON_FORMAT);
     }
 
     export function IsBefore(source: string, other: string) {

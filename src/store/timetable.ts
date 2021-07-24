@@ -7,7 +7,7 @@ const TT = 'https://spider.scotscollege.school.nz/Spider2011/Handlers/Timetable.
 
 function cleanData({data, date}: { data: WebTimetableData, date: string }): WebTimetableData {
     data = data.filter(d => {
-        return DateParser.instance(d.Date, DateParser.TT_FORMAT).isAfter(DateParser.instance(date, DateParser.REQUEST_FORMAT))
+        return DateParser.instance(d.Date, DateParser.TT_FORMAT).isAfter(DateParser.instance(date, DateParser.COMMON_FORMAT))
     });
     return data;
 }
@@ -17,7 +17,7 @@ export const timetable: Module<any, any> = {
     state: {
         timetable: {} as TimetableData,
         error: '' as string,
-        isLoading: false
+        isLoading: false,
     },
     getters: {
         timetable(state) {
@@ -44,7 +44,7 @@ export const timetable: Module<any, any> = {
                     url: TT,
                     data: {
                         StudentKey: keycode,
-                        Date: date,
+                        Date: DateParser.ReFormat(date, DateParser.COMMON_FORMAT, DateParser.REQUEST_FORMAT),
                         Mode: "STU"
                     },
                     alias: "fetching additional timetable data"
@@ -77,7 +77,7 @@ export const timetable: Module<any, any> = {
                     url: TT,
                     data: {
                         StudentKey: keycode,
-                        Date: date,
+                        Date: DateParser.ReFormat(date, DateParser.COMMON_FORMAT, DateParser.REQUEST_FORMAT),
                         Mode: "STU"
                     },
                     alias: "fetching timetable data"

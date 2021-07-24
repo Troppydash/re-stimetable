@@ -38,10 +38,16 @@ export class DataFilterer {
                         switch (node.operator) {
                             case '<':
                                 return left < right;
+                            case "<=":
+                                return left <= right;
                             case '>':
                                 return left > right;
+                            case ">=":
+                                return left >= right;
                             case '=':
                                 return left == right;
+                            case '!=':
+                                return left != right;
                         }
                         break;
                     }

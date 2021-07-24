@@ -72,7 +72,7 @@ export const PERIOD_DESCRIPTION: Partial<Record<keyof TimetablePeriod, PeriodDes
         inShort: 'The Period Start Time',
         spec: {
             type: 'string',
-            examples: ['9:35', '10:25', '13:15'],
+            examples: ['09:35', '10:25', '13:15'],
             format: '[hour]:[minute]'
         }
     },
@@ -80,7 +80,7 @@ export const PERIOD_DESCRIPTION: Partial<Record<keyof TimetablePeriod, PeriodDes
         inShort: 'The Period End Time',
         spec: {
             type: 'string',
-            examples: ['9:35', '10:25', '13:15'],
+            examples: ['09:35', '10:25', '13:15'],
             format: '[hour]:[minute]'
         }
     },
@@ -112,8 +112,8 @@ export const PERIOD_DESCRIPTION: Partial<Record<keyof TimetablePeriod, PeriodDes
         inShort: 'The Date of this Period',
         spec: {
             type: 'string',
-            examples: ['21/09/2021', '01/07/2022', '15/02/2019'],
-            format: '[day]/[month]/[year]',
+            examples: ['2021-09-21', '2022-01-07', '2019-02-05'],
+            format: '[year]/[months]/[day]',
         }
     },
     Teacher: {
@@ -142,8 +142,8 @@ export namespace TimetableHelpers {
             out[date]
                 = day.periodData.map(period => ({
                 PeriodID: +period.PeriodID,
-                FromTime: period.FromTime,
-                ToTime: period.ToTime,
+                FromTime: DateParser.ReFormat(period.FromTime, DateParser.TT_TIME, DateParser.COMMON_TIME),
+                ToTime: DateParser.ReFormat(period.ToTime, DateParser.TT_TIME, DateParser.COMMON_TIME),
                 Subject: period.teacherTimeTable?.Desc ?? '',
                 Abbrev: period.teacherTimeTable?.Abbrev ?? '',
                 Class: +period.teacherTimeTable?.Class || 0,
@@ -154,6 +154,7 @@ export namespace TimetableHelpers {
         }
         return out;
     }
+
     export function ToSortedDays(data: TimetableData): TimetableDay[] {
         return Object.values(data).sort((left: TimetableDay, right: TimetableDay) => {
             const ld = left[0].Date;
@@ -167,6 +168,7 @@ export namespace TimetableHelpers {
             return 1;
         });
     }
+
     export function EncodePeriod({period}: { period: TimetablePeriod }): string {
         return `${period.Date}|${period.PeriodID}|${period.Room}`;
     }
