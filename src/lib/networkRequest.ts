@@ -31,19 +31,28 @@ export class NetworkRequest {
     }
 
     public async send(): Promise<RequestResponse> {
-        const result = await fetch(this.url, {
-            method: this.type,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: this.data === null ? '' : JSON.stringify(this.data)
-        });
-        const text = await result.text();
+        try {
+            const result = await fetch(this.url, {
+                method: this.type,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: this.data === null ? '' : JSON.stringify(this.data)
+            });
+            const text = await result.text();
 
-        return {
-            ok: result.ok,
-            code: result.status,
-            text,
+            return {
+                ok: result.ok,
+                code: result.status,
+                text,
+            }
+        } catch (e) {
+            return {
+                ok: false,
+                code: 404,
+                text: e.message
+            };
         }
+
     }
 }

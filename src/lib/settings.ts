@@ -13,7 +13,7 @@ const SettingsDefault: Record<SettingsKeyType, any> = {
 
     'user': {
         name: 'unnamed',
-        keycode: 'qi t',
+        keycode: '',
     },
 
     "map": {

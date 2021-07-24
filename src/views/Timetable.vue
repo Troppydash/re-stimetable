@@ -42,6 +42,7 @@ import MapCanvas from "@/components/map/MapCanvas.vue";
 import {TimetableHelpers, WebTimetablePeriod} from "@/lib/data/timetable";
 import {WebSettings} from "@/lib/settings";
 import Filterer from "@/components/controls/Filter/Filterer.vue";
+import alerts from "@/lib/mixins/alerts";
 
 const BASE_DATE = DateParser.Today();
 const MAX_DAYS = 200;
@@ -50,6 +51,7 @@ const DATE_MAX = DateParser.AddDays(BASE_DATE, MAX_DAYS);
 export default defineComponent({
     name: "Timetable",
     components: {Filterer, MapCanvas, DynamicTable, Alert},
+    mixins: [alerts],
     data() {
         const closed = WebSettings.instance.getSetting('map-closed');
         return {
@@ -132,8 +134,14 @@ export default defineComponent({
             }
         }
     },
-    mounted() {
-        this.fetchTimetable();
+    async mounted() {
+        await this.fetchTimetable();
+        if (this.data.length === 0) {
+            this.alert({
+                title: 'No Timetable Found',
+                text: 'Head to SETTINGS to verify your keycode, look for the section \'Setup your Keycode\' in \'account\''
+            }, -1);
+        }
     }
 });
 </script>

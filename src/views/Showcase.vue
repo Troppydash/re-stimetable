@@ -9,7 +9,7 @@
         </div>
         <div>
             <a class="st-text st-text--title st-text--link">Your Timetable</a>
-            <p class="st-text st-text--90">-- note that this is not your actual timetable</p>
+            <p class="st-text st-text--90">- note that this is not your actual timetable, it is an example</p>
         </div>
         <div>
             <ExampleTable />
@@ -25,22 +25,13 @@
         </div>
         <div>
             <p class="st-text">
-                View and tinker with the source code of the site
-                <a class="st-text st-text--link"
-                   target="_blank"
-                   href="https://github.com/Troppydash/re-stimetable">here</a>
-            </p>
-            <p class="st-text">
-                or find the source code of the map renderer
-                <a class="st-text st-text--link"
-                   target="_blank"
-                   href="https://github.com/Troppydash/stimetable">here</a>
-            </p>
-            <p class="st-text">
-                and the stylesheet
-                <a class="st-text st-text--link"
-                   target="_blank"
-                   href="https://github.com/Troppydash/stimetable.css">here</a>
+                Check your timetable without entering them yourself,
+                <br/>
+                Use powerful queries to select specific periods,
+                <br/>
+                Visually find where your class is,
+                <br/>
+                Get started <a class="st-text st-text--link" href="/timetable">here</a>
             </p>
         </div>
     </div>

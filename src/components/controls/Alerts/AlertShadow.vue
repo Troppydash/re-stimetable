@@ -1,5 +1,5 @@
 <template>
-    <div class="st-shadow">
+    <div class="st-shadow st-shadow--hidden">
         <div v-show="alerts.length > 0" class="st-alert__container st-alert__tr">
             <Alert v-for="({ text, title }, index) in alertsReversed"
                    :title="title"
@@ -45,26 +45,36 @@ export default defineComponent({
         showAlert(text: string | {
             text: string,
             title: string
-        }, duration: number = 5000) {
-            if (duration >= 0) {  // add duration of timeout
-                const timeout = setTimeout(() => {
-                    this.dismissAlert(this.timeouts.indexOf(timeout));
-                }, duration);
-                this.timeouts = [...this.timeouts, timeout];
-            } else {  // no timeout
-                this.timeouts = [...this.timeouts, null];
-            }
+        }, duration: number): Promise<void> {
+            return new Promise<void>(resolve => {
+                if (duration >= 0) {  // add duration of timeout
+                    const timeout = setTimeout(() => {
+                        this.dismissAlert(this.timeouts.indexOf(timeout));
+                        return resolve();
+                    }, duration);
+                    this.timeouts = [...this.timeouts, timeout];
+                } else {  // no timeout
+                    const id = Date.now();
+                    this.timeouts = [...this.timeouts, id];
+                    const poll = setInterval(() => {
+                        if (!this.timeouts.includes(id)) {
+                            clearInterval(poll);
+                            return resolve();
+                        }
+                    }, 1000);
+                }
 
-            if (typeof text === "string") {  // add alert with body
-                this.alerts = [...this.alerts, {
-                    text
-                }]
-            } else {  // add alert with title and body
-                this.alerts = [...this.alerts, {
-                    text: text.text,
-                    title: text.title,
-                }]
-            }
+                if (typeof text === "string") {  // add alert with body
+                    this.alerts = [...this.alerts, {
+                        text
+                    }]
+                } else {  // add alert with title and body
+                    this.alerts = [...this.alerts, {
+                        text: text.text,
+                        title: text.title,
+                    }]
+                }
+            })
         },
 
     },

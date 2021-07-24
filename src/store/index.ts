@@ -11,8 +11,7 @@ export default createStore({
     mutations: {},
     actions: {
         init(store, {settings}: { settings: WebSettings }) {
-            const user = settings.getSetting('user');
-            store.dispatch('auth/init', {user});
+            store.dispatch('auth/init', {settings});
 
             // online and offline
             store.dispatch('online/init', {

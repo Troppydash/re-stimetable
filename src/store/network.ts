@@ -63,7 +63,7 @@ export const network: Module<any, any> = {
             }
 
             const response = await request.send();
-            if (!response.ok && !store.getters['online/isOnline']) {
+            if (!response.ok && !store.rootGetters['online/isOnline']) {
                 store.commit('pushUncalled', {request});
                 (this as any).$app.$shadow.evoke('showAlert', {
                     title: 'Network',

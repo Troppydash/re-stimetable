@@ -1,5 +1,5 @@
 <template>
-    <div v-show="isOpen" class="st-shadow st-shadow--darken" @click.stop="onClose">
+    <div v-show="isOpen" class="st-shadow st-shadow--darken" @click="onClose">
         <div class="st-dialog" @click.stop>
             <div class="st-dialog__header">
                 <p class="st-text st-text--title">{{ title ?? 'Dialog Title' }}</p>
@@ -8,11 +8,11 @@
                 <slot/>
             </div>
             <div class="st-dialog__footer">
-                <button class="st-button st-button--primary st-button--fill"
+                <button v-if="option1" class="st-button st-button--primary st-button--fill"
                         @click="onOption1">
                     {{ option1 ?? "Continue" }}
                 </button>
-                <button class="st-button"
+                <button v-if="option2" class="st-button"
                         @click="onOption2">
                     {{ option2 ?? "Discard" }}
                 </button>
@@ -29,8 +29,9 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 
 @import "../../../css/dialog";
+@import "../../../css/shadow";
 
 </style>
