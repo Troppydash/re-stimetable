@@ -1,23 +1,20 @@
 import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router'
-import Showcase from '../views/Showcase.vue';
-import Timetable from '../views/Timetable.vue';
-import Settings from '../views/Settings.vue';
 
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
         name: 'Showcase',
-        component: Showcase
+        component: () => import("../views/Showcase.vue")
     },
     {
         path: '/timetable',
         name: 'Timetable',
-        component: Timetable
+        component: () => import("../views/Timetable.vue")
     },
     {
         path: '/settings',
         name: "Settings",
-        component: Settings
+        component: () => import("../views/Settings.vue")
     }
 ]
 
