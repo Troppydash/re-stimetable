@@ -27,6 +27,13 @@ const SettingsDefault: Record<SettingsKeyType, any> = {
     'map-closed': false,
 }
 
+function attemptToOrDefault<T>(fn: () => T, otherwise?: T): T | null {
+    try {
+        return fn();
+    } catch (e) {
+        return otherwise ?? null;
+    }
+}
 
 export class WebSettings {
     public static instance = new WebSettings(Storage);
@@ -36,21 +43,31 @@ export class WebSettings {
     }
 
     public init() {
-        for (const setting of SettingsKeys) {
-            if (!this.storage.exists(setting)) {
-                this.storage.store(setting, SettingsDefault[setting]);
+        attemptToOrDefault(() => {
+            for (const setting of SettingsKeys) {
+                if (!this.storage.exists(setting)) {
+                    this.storage.store(setting, SettingsDefault[setting]);
+                }
             }
-        }
-        this.storage.commit();
+            this.storage.commit();
+        });
+    }
+
+    public clear() {
+        attemptToOrDefault(() => {
+            this.storage.clear();
+        });
     }
 
     public getSetting(key: SettingsKeyType) {
-        return this.storage.view(key);
+        return attemptToOrDefault(() => this.storage.view(key), {});
     }
 
     public setSetting(key: SettingsKeyType, value: any) {
-        this.storage.store(key, value);
-        this.storage.commit();
+        attemptToOrDefault(() => {
+            this.storage.store(key, value);
+            this.storage.commit();
+        });
     }
 
 }

@@ -137,7 +137,7 @@
 <script lang="ts">
 
 import {defineComponent} from "vue";
-import Dialog from "@/components/controls/Dialogs/Dialog";
+import Dialog from "@/components/controls/Dialogs/Dialog.vue";
 import alerts from "@/lib/mixins/alerts";
 
 export default defineComponent({
@@ -162,7 +162,7 @@ export default defineComponent({
         }
     },
     computed: {
-        auth() {
+        auth(): any {
             return this.$store.getters['auth/auth'];
         }
     },

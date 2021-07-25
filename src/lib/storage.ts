@@ -6,6 +6,8 @@ export interface WebStorage {
     exists(key: string): boolean;
 
     commit(): boolean;
+
+    clear(): void;
 }
 
 // TODO: this is inefficient, but caching may make it better
@@ -59,6 +61,10 @@ export class LocalWebStorage implements WebStorage {
 
     commit() {
         return true;
+    }
+
+    clear(): void {
+        localStorage.removeItem(this.database);
     }
 }
 

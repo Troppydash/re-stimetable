@@ -15,7 +15,8 @@
         </div>
         <div class="settings__content">
             <Account v-if="selectedTab === 0"/>
-            <About v-if="selectedTab === 1"/>
+            <Advanced v-if="selectedTab === 1"/>
+            <About v-if="selectedTab === 2"/>
         </div>
     </div>
 </template>
@@ -27,12 +28,13 @@ import {WebSettings} from "@/lib/settings";
 import {mapState} from "vuex";
 import Account from "@/components/settings/Account.vue";
 import About from "@/components/settings/About.vue";
+import Advanced from "@/components/settings/Advanced.vue";
 
-const TABS = ['Account', 'About'];
+const TABS = ['Account', 'Advanced', 'About'];
 
 export default defineComponent({
     name: "Settings",
-    components: {About, Account},
+    components: {Advanced, About, Account},
     data() {
         return {
             selectedTab: 0,

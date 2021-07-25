@@ -12,10 +12,13 @@
                        @click="updateCount">
                 <i :class="[{'ri-error-warning-line': !(isOk && isValid) }, 'ri-check-line']"></i>
             </div>
-            <input class="st-button"
-                   size="6"
-                   style="height: 3rem;"
-                   @click="toggleInfo" v-model="_today"/>
+            <input class="st-input"
+                   style="height: 3rem;width: calc(10ch + 2.1rem);" v-model="_today"/>
+            <button class="st-button"
+                    style="height: 3rem; width: 3rem; display:flex; justify-content: center;align-items: center"
+                    @click="toggleInfo">
+                <i class="ri-menu-line"></i>
+            </button>
         </div>
 
         <div class="filterer__ac"
@@ -33,6 +36,9 @@
 
         <div v-show="showInfo"
              class="filterer__info">
+            <div class="filterer__title">
+                <p class="st-text st-text--130">Columns Specifications</p>
+            </div>
             <div class="filterer__content">
                 <div class="filterer__tabs">
                     <div v-for="(tab, index) in tabs"
@@ -282,7 +288,7 @@ export default defineComponent({
             return (this as any).$refs.input;
         },
         width(): string {
-            if (this.query.length < 40) {
+            if (this.query.length < 30) {
                 return '600px';
             } else if (this.query.length < 70) {
                 return '1000px';
@@ -424,7 +430,7 @@ export default defineComponent({
 
     .filterer__info {
         position: absolute;
-        top: 3rem;
+        top: 3.5rem;
         left: 0;
         z-index: 10;
 
@@ -465,6 +471,12 @@ export default defineComponent({
             }
         }
 
+        .filterer__title {
+            background: var(--st-background);
+            padding: 0.5rem;
+
+            border-bottom: 1px solid var(--st-secondary);
+        }
 
         .filterer__footer {
             display: flex;
