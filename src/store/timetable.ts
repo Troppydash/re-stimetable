@@ -54,7 +54,7 @@ export const timetable: Module<any, any> = {
                     if (response.ok) {
                         const data = JSON.parse(response.text).d;
                         store.commit('setTimetable', {
-                            data: {...store.state.timetable, ...TimetableHelpers.FromWebData(cleanData({data, date}))}
+                            data: {...store.state.timetable, ...TimetableHelpers.FromWebData(data)}
                         });
                     }
                     return resolve(true);

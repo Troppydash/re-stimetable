@@ -119,7 +119,7 @@ export default defineComponent({
                     this.nextDate = ttNextDate;
                 }
             }
-            this.nextDate = DateParser.AddDays(this.nextDate, 7);
+            this.nextDate = DateParser.AddDays(this.nextDate, 5);
         },
         async fetchTimetable() {
             await this.$store.dispatch('timetable/fetchTimetable', {date: this.nextDate});
@@ -172,11 +172,31 @@ export default defineComponent({
         bottom: 1rem;
         right: 1rem;
     }
+
+    .timetable__table {
+    }
 }
 
 @media screen and (max-width: 1024px) {
     .timetable {
         width: 95%;
+
+        .timetable__table {
+            display: flex;
+            height: calc(100vh - 250px);
+        }
+
+        .timetable__map {
+            width: ~"min(60vw, 300px)";
+            bottom: 0;
+            right: 0;
+        }
+    }
+}
+
+@media screen and (max-width: 764px) {
+    .timetable {
+        padding: 2rem 0.5rem;
     }
 }
 

@@ -1,5 +1,9 @@
 <template>
-    <List v-if="showList"/>
+    <List v-if="showList"
+          :content="package.data"
+          :is-loading="package.isLoading"
+          :on-more="onMore"
+          v-model:selected="_selected"/>
     <VTable v-else
             :content="package.data"
             :is-loading="package.isLoading"
@@ -18,7 +22,7 @@ export default defineComponent({
     props: ["package", "onMore", 'selected'],
     data() {
         return {
-            showList: false,
+            showList: window.innerWidth <= 1024,
             _selected: this.selected
         }
     },
@@ -36,8 +40,8 @@ export default defineComponent({
         },
     },
     mounted() {
-        window.addEventListener('resize', this.updateShowList);
         this.updateShowList();
+        window.addEventListener('resize', this.updateShowList);
     },
     beforeUnmount() {
         window.removeEventListener('resize', this.updateShowList);

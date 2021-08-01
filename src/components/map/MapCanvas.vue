@@ -331,7 +331,8 @@ export default defineComponent({
                     newSize: () => {
                         if (this.isFs) {
                             return {
-                                width: window.innerWidth
+                                width: window.innerWidth,
+                                height: window.innerHeight
                             };
                         }
                         return {
@@ -448,8 +449,8 @@ export default defineComponent({
 
     .map-controls {
         position: absolute;
-        top: 0.5rem;
-        right: 1rem;
+        top: 0.25rem;
+        right: 0.5rem;
 
         display: flex;
         flex-direction: column;

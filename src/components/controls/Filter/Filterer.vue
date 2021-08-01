@@ -2,19 +2,20 @@
     <div class="filterer" :style="{'width': width}">
         <div class="filterer__input">
             <div class="filterer__input-container">
-                <input class="st-input"
-                       style="padding-right: 3rem; width: 100%"
+                <input class="st-input st-input--attachment" id="filter_input"
                        v-model="query"
                        ref="input"
                        placeholder="where Room = ..."
                        @focus="() => onInputFocus(true)" @blur="() => onInputFocus(false)"
                        @keydown="onKey"
-                       @click="updateCount">
-                <i :class="[{'ri-error-warning-line': !(isOk && isValid) }, 'ri-check-line']"></i>
+                       @click="updateCount"
+                       :class="['filter-ok', {'filter-error': !(isOk && isValid) }]">
+                <i :class="[{'ri-error-warning-line': !(isOk && isValid) }, 'ri-check-line']"
+                    class="st-input__attachment"></i>
             </div>
             <input class="st-input"
                    style="height: 3rem;width: calc(10ch + 2.1rem);" v-model="_today"/>
-            <button class="st-button"
+            <button class="st-button info-toggle"
                     style="height: 3rem; width: 3rem; display:flex; justify-content: center;align-items: center"
                     @click="toggleInfo">
                 <i class="ri-menu-line"></i>
@@ -23,7 +24,7 @@
 
         <div class="filterer__ac"
              v-show="acFocused || inputFocused"
-             :style="{left: `${leftWords}ch`}"
+             :style="{left: `calc(${leftWords}ch - ${scrollX}px)`}"
              @focus="() => onAcFocus(true)"
              tabindex="-1">
             <div v-for="(text, index) in ac"
@@ -37,33 +38,10 @@
         <div v-show="showInfo"
              class="filterer__info">
             <div class="filterer__title">
-                <p class="st-text st-text--130">Columns Specifications</p>
+                <p class="st-text st-text--130">Status</p>
             </div>
             <div class="filterer__content">
-                <div class="filterer__tabs">
-                    <div v-for="(tab, index) in tabs"
-                         @click="() => handleClick(index)"
-                         class="filterer__tab"
-                         :class="{'filterer__tab--selected':  tabs[selectedTab] === tab }">
-                        <span class="st-text">{{ tab }}</span>
-                    </div>
-                </div>
-                <div class="filterer__body">
-                    <p class="st-text st-text--170">{{ tabs[selectedTab] }}</p>
-                    <hr/>
-                    <p class="st-text">{{ info.inShort }}</p>
-                    <br/>
-                    <br/>
-                    <p class="st-text">Specification</p>
-                    <table class="st-table st-table--small st-table--full">
-                        <tbody style="font-family: 'Fira Code', monospace">
-                        <tr v-for="([key, value]) in Object.entries(info.spec)">
-                            <td style="width: 100px">{{ key }}</td>
-                            <td>{{ value }}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+
             </div>
             <div class="filterer__footer">
                 <span class="st-text st-text--80">{{ filterInfo.columns }} columns</span>
@@ -105,6 +83,7 @@ export default defineComponent({
             query: '',
             filterer: new DataFilterer(),
             inputFocused: false,
+            scrollX: 0,
 
 
             // tabs
@@ -297,6 +276,7 @@ export default defineComponent({
         }
     },
     methods: {
+
         // ridiculous code for a simple dialog
         onInputFocus(focus: boolean) {
             if (!focus) {
@@ -343,6 +323,7 @@ export default defineComponent({
             // update the offset
             setTimeout(() => {
                 this.leftWords = this.input.selectionStart;
+                this.setScroll();
             }, 100);  // evil delay because dom doesn't update in time
         },
         selectAC(index: number) {
@@ -371,12 +352,21 @@ export default defineComponent({
             }
 
             this.query = [left, word, this.query.slice(position)].join('');
-            this.input.setSelectionRange(position + word.length, position + word.length);
-            this.input.focus();
-            this.inputFocused = true;
-            this.acFocused = false;
-            this.updateCount();
-        }
+            const input = document.getElementById('filter_input') as any;
+            input.selectionEnd = input.selectionStart = position;
+            input.blur();
+            input.focus();
+            input.setSelectionRange(position + word.length, position + word.length);
+
+            setTimeout(() => {
+                this.inputFocused = true;
+                this.acFocused = false;
+                this.updateCount();
+            }, 20);
+        },
+        setScroll() {
+            this.scrollX = this.input.scrollLeft;
+        },
     },
     mounted() {
     }
@@ -384,6 +374,21 @@ export default defineComponent({
 </script>
 
 <style lang="less" scoped>
+
+.st-input {
+    &.st-input--attachment {
+        padding-right: 3rem;
+        width: 100%;
+    }
+}
+
+.st-input__attachment {
+    position: absolute;
+    right: 1rem;
+    top: 25%;
+    color: var(--st-text);
+    font-size: 150%;
+}
 
 .filterer {
     position: relative;
@@ -417,14 +422,6 @@ export default defineComponent({
             flex: 1 1;
             display: inline-block;
             position: relative;
-
-            & > i {
-                position: absolute;
-                right: 1rem;
-                top: 25%;
-                color: var(--st-text);
-                font-size: 150%;
-            }
         }
     }
 
@@ -442,33 +439,8 @@ export default defineComponent({
 
         .filterer__content {
             display: flex;
+            flex-direction: column;
 
-            .filterer__tabs {
-                overflow-y: auto;
-                flex: 0 0 200px;
-                border-right: 1px solid var(--st-secondary);
-
-                .filterer__tab {
-                    padding: 0.5rem;
-
-                    &--selected {
-                        background: var(--st-background-hover) !important;
-                    }
-
-                    &:hover {
-                        background: var(--st-background-hover);
-                    }
-                }
-
-                & > div + div {
-                    border-top: 1px solid var(--st-secondary);
-                }
-            }
-
-            .filterer__body {
-                flex: 1 1;
-                padding: 0.75rem 1rem;
-            }
         }
 
         .filterer__title {
@@ -494,6 +466,33 @@ export default defineComponent({
                 border-left: 1px solid var(--st-text);
             }
         }
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .info-toggle {
+        display: none !important;
+    }
+
+    .st-input--attachment {
+        padding-right: 1rem !important;
+    }
+
+    .st-input__attachment {
+        display: none;
+    }
+
+    .st-input {
+        &.filter-ok {
+            border: 1px solid var(--st-secondary);
+            border-bottom: 2px solid green;
+        }
+
+        &.filter-error {
+            border: 1px solid var(--st-secondary);
+            border-bottom: 2px solid #950000;
+        }
+
     }
 }
 

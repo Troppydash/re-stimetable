@@ -12,7 +12,7 @@
             </router-link>
         </div>
         <div class="topbar__details">
-            <span class="st-text">Hello: {{ username }}</span>
+            <span class="st-text">{{ username }}</span>
         </div>
     </div>
 </template>
@@ -46,6 +46,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
     z-index: 20;
 
     .topbar__actions {
