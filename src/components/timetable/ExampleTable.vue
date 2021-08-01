@@ -4,7 +4,7 @@
 
 <script>
 import DynamicTable from "./DynamicTable";
-import {TimetableHelpers} from "@/lib/data/timetable";
+import {TimetableHelpers} from "../../lib/data/timetable";
 
 export default {
     name: "ExampleTable",

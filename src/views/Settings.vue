@@ -1,9 +1,8 @@
 <template>
     <div class="settings">
         <div class="settings__sidebar">
-            <div class="st-list st-list--big st-list--primary">
+            <div class="st-list st-list--big st-list--primary st-list--responsive st-list--full">
                 <div class="st-list__section">
-                    <div class="st-list__header st-text st-text--250">Settings</div>
                     <div v-for="(tab, index) in tabs"
                          class="st-list__item"
                          :class="{'st-list__selected': index === selectedTab}"
@@ -29,12 +28,14 @@ import {mapState} from "vuex";
 import Account from "@/components/settings/Account.vue";
 import About from "@/components/settings/About.vue";
 import Advanced from "@/components/settings/Advanced.vue";
+import alerts from "@/lib/mixins/alerts";
 
 const TABS = ['Account', 'Advanced', 'About'];
 
 export default defineComponent({
     name: "Settings",
     components: {Advanced, About, Account},
+    mixins: [alerts],
     data() {
         return {
             selectedTab: 0,
@@ -49,7 +50,10 @@ export default defineComponent({
         }
     },
     mounted() {
-
+        // this.alert({
+        //     title: "HELLO WORLD HELLO WORLDHELLO WORLDHELLO WORLD",
+        //     text: 'HELLO WORLDHELLO WORLDHELLO WORLD'
+        // }, -1);
     }
 })
 </script>
@@ -58,22 +62,60 @@ export default defineComponent({
 @import "../css/addons";
 
 .settings {
-    margin: 4rem auto 0;
+    margin: 2rem auto 0;
     width: 900px;
     padding-bottom: 5rem;
 
     display: flex;
 
     .settings__sidebar {
-        margin-right: 2rem;
+        min-width: 200px;
+        margin-right: 1rem;
         position: sticky;
-        top: 0;
+        top: 1rem;
         align-self: flex-start;
     }
 
     .settings__content {
         flex: 1 1;
-        padding: 1rem 2rem;
+        padding: 0 1rem;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .settings {
+        flex-direction: column;
+        width: 100%;
+        padding: 2rem;
+        margin: 0 auto;
+
+        .settings__sidebar {
+            margin-bottom: 1rem;
+            position: initial;
+        }
+
+        .settings__content {
+            padding: 0;
+        }
+    }
+
+    .st-list--responsive {
+        .st-list__section {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-wrap: wrap;
+
+            .st-list__header {
+                display: none;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 764px) {
+    .settings {
+        padding: 1rem;
     }
 }
 

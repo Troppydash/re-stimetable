@@ -26,6 +26,15 @@
 export default {
     name: "Dialog",
     props: ["isOpen", "title", "option1", "option2", "onClose", "onOption1", "onOption2"],
+    watch: {
+        isOpen(isOpen) {
+            if (isOpen) {
+                document.querySelector('body').style.overflow = 'hidden';
+            } else {
+                document.querySelector('body').style.overflow = "";
+            }
+        }
+    }
 }
 </script>
 

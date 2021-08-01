@@ -140,7 +140,7 @@ export default defineComponent({
             this.alert({
                 title: 'No Timetable Found',
                 text: 'Head to SETTINGS to verify your keycode, look for the section \'Setup your Keycode\' in \'account\''
-            }, -1);
+            }, 10 * 1000);
         }
     }
 });
@@ -179,7 +179,9 @@ export default defineComponent({
 
 @media screen and (max-width: 1024px) {
     .timetable {
-        width: 95%;
+        margin: 0 !important;
+        padding: 2rem;
+        width: 100%;
 
         .timetable__table {
             display: flex;

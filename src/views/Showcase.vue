@@ -11,7 +11,7 @@
             <a class="st-text st-text--title st-text--link">Your Timetable</a>
             <p class="st-text st-text--90">- note that this is not your actual timetable, it is an example</p>
         </div>
-        <div>
+        <div class="showcase__table">
             <ExampleTable />
         </div>
         <div>
@@ -58,7 +58,8 @@ export default {
 <style lang="less" scoped>
 
 .showcase {
-    margin: 0 5%;
+    max-width: 1300px;
+    margin: 0 auto;
     padding: 2rem 2rem;
 
     overflow: hidden;
@@ -75,8 +76,13 @@ export default {
 
 @media screen and (max-width: 1024px) {
     .showcase {
-        width: 95%;
+        padding: 1rem;
         margin: 0 auto;
+
+        .showcase__table {
+            height: 600px;
+            display: flex;
+        }
     }
 }
 

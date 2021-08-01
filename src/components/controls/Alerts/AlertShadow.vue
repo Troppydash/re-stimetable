@@ -88,6 +88,7 @@ export default defineComponent({
 
 .st-alert__container {
     margin-top: 1rem;
+    width: auto;
 
     & > .st-alert + .st-alert {
         margin-top: 1rem;

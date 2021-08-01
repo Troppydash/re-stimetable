@@ -432,8 +432,10 @@ export default defineComponent({
 
         .map-siderbar__body {
             flex: 1 1;
-            min-width: 200px;
+            min-width: 220px;
             padding: 0.5rem 0.75rem;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .map-siderbar__toggle {
