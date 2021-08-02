@@ -69,7 +69,7 @@ export default defineComponent({
     }
 
     &.st-list--scrollable {
-        overflow-y: overlay;
+        overflow-y: scroll;
     }
 }
 

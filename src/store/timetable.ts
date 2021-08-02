@@ -5,11 +5,18 @@ import {DateParser} from "@/lib/dates/dateParser";
 
 const TT = 'https://spider.scotscollege.school.nz/Spider2011/Handlers/Timetable.asmx/GetTimeTable_ByStudentMode';
 
+function restrictData(data: WebTimetableData): WebTimetableData {
+    // limit data periodData
+    return data.map(day => ({
+        ...day,
+        periodData: day.periodData.slice(0, 6)
+    }));
+}
+
 function cleanData({data, date}: { data: WebTimetableData, date: string }): WebTimetableData {
-    data = data.filter(d => {
-        return DateParser.instance(d.Date, DateParser.TT_FORMAT).isAfter(DateParser.instance(date, DateParser.COMMON_FORMAT))
+    return data.filter(d => {
+        return !DateParser.instance(d.Date, DateParser.TT_FORMAT).isBefore(DateParser.instance(date, DateParser.COMMON_FORMAT))
     });
-    return data;
 }
 
 export const timetable: Module<any, any> = {
@@ -54,7 +61,7 @@ export const timetable: Module<any, any> = {
                     if (response.ok) {
                         const data = JSON.parse(response.text).d;
                         store.commit('setTimetable', {
-                            data: {...store.state.timetable, ...TimetableHelpers.FromWebData(data)}
+                            data: {...store.state.timetable, ...TimetableHelpers.FromWebData(restrictData(data))}
                         });
                     }
                     return resolve(true);
@@ -90,7 +97,7 @@ export const timetable: Module<any, any> = {
                     if (response.ok) {
                         const data = JSON.parse(response.text).d;
                         store.commit('setTimetable', {
-                            data: TimetableHelpers.FromWebData(cleanData({data, date}))
+                            data: TimetableHelpers.FromWebData(restrictData(cleanData({data, date})))
                         });
                     } else {
                         store.commit('setError', {
