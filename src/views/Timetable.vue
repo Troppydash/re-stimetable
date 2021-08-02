@@ -150,14 +150,15 @@ export default defineComponent({
 
 .timetable {
     margin: 0 auto;
-    padding: 2rem 2rem;
+    padding: 2rem;
+    padding-top: 0;
     width: 95%;
 
 
     .timetable__filter {
         display: flex;
         justify-content: flex-end;
-        margin-bottom: 2rem;
+        margin: 1.5rem 0;
     }
 
     .timetable__map {
@@ -181,7 +182,13 @@ export default defineComponent({
     .timetable {
         margin: 0 !important;
         padding: 2rem;
+        padding-top: 0;
         width: 100%;
+
+        .timetable__filter {
+            margin: 1rem 0;
+        }
+
 
         .timetable__table {
             display: flex;
@@ -199,6 +206,11 @@ export default defineComponent({
 @media screen and (max-width: 764px) {
     .timetable {
         padding: 2rem 0.5rem;
+        padding-top: 0;
+
+        .timetable__filter {
+            margin: 0.5rem 0;
+        }
     }
 }
 

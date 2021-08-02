@@ -86,12 +86,18 @@ export default defineComponent({
     .settings {
         flex-direction: column;
         width: 100%;
-        padding: 2rem;
+        padding: 1.5rem;
+        padding-top: 0;
         margin: 0 auto;
 
         .settings__sidebar {
-            margin-bottom: 1rem;
-            position: initial;
+            padding: 0.5rem 0;
+            position: sticky;
+            top: 0;
+
+            width: 100%;
+            background: var(--st-background);
+            z-index: 10;
         }
 
         .settings__content {
@@ -116,6 +122,7 @@ export default defineComponent({
 @media screen and (max-width: 764px) {
     .settings {
         padding: 1rem;
+        padding-top: 0;
     }
 }
 
