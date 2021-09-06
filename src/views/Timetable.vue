@@ -138,8 +138,8 @@ export default defineComponent({
         await this.fetchTimetable();
         if (this.data.length === 0) {
             this.alert({
-                title: 'No Timetable Found',
-                text: 'Head to SETTINGS to verify your keycode, look for the section \'Setup your Keycode\' in \'account\''
+                title: 'Bad Keycode',
+                text: 'Head to SETTINGS under section Setup your Keycode in ACCOUNT'
             }, 10 * 1000);
         }
     }

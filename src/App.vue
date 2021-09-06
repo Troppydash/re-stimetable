@@ -12,11 +12,46 @@ import Notifications from "@/components/controls/Alerts/AlertShadow";
 import Alert from "@/components/controls/Alerts/Alert";
 import AlertShadow from "@/components/controls/Alerts/AlertShadow";
 import UpdateHandler from "@/components/workers/UpdateHandler";
+import alerts from "@/lib/mixins/alerts";
+
+function filterKeys(object, keys) {
+    const newObj = {};
+    for (const [key, value] of Object.entries(object)) {
+        if (keys.includes(key)) {
+            newObj[key] = value;
+        }
+    }
+    return newObj;
+}
 
 export default {
     components: {UpdateHandler, AlertShadow, Alert, Notifications, Topbar},
-    mounted() {
-        this.$store.dispatch('init', { settings: WebSettings.instance});
+    mixins: [alerts],
+    methods: {
+        async parseParams() {
+            const urlSearchParams = new URLSearchParams(window.location.search);
+            const params = Object.fromEntries(urlSearchParams.entries());
+            console.log(params);
+            // filter for keys
+            const temp = filterKeys(params, ["name", "keycode"]);
+            console.log(temp);
+
+            if (Object.keys(temp).length > 0) {
+                this.alert({
+                    title: 'Account',
+                    text: 'Temporary account used, go to SETTINGS and click CHANGE under Alias and Keycode to save'
+                }, 10000);
+                await this.$store.dispatch('auth/updateTemp', temp);
+                return true;
+            }
+            return false;
+        }
+    },
+    async mounted() {
+        // parse query data
+        await this.parseParams();
+
+        await this.$store.dispatch('init', { settings: WebSettings.instance});
     }
 }
 </script>

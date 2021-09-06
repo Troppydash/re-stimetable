@@ -12,19 +12,23 @@
             </router-link>
         </div>
         <div class="topbar__details">
+            <span class="st-text st-text--bold">I AM </span>
             <span class="st-text">{{ username }}</span>
         </div>
     </div>
 </template>
 
 <script>
-import {mapState} from "vuex";
+import {mapGetters, mapState} from "vuex";
 import {helpers} from "@/lib/helpers";
 
 export default {
     name: 'Topbar',
     computed: {
-        ...mapState('auth', ['name']),
+        ...mapGetters('auth', [
+            'name',
+            'isTemp'
+        ]),
         username() {
             return helpers.stringLimit(this.name, 20);
         }

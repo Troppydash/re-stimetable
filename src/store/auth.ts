@@ -6,15 +6,26 @@ const SERVER = 'https://dry-sierra-69491.herokuapp.com';
 export const auth: Module<any, any> = {
     namespaced: true,
     state: {
+        temp: {},
         name: '',
         keycode: '',
     },
     getters: {
+        name(state) {
+            if (state.temp.name)
+                return state.temp.name;
+            return state.name;
+        },
         keycode(state) {
+            if (state.temp.keycode)
+                return state.temp.keycode;
             return state.keycode;
         },
         auth(state) {
-            return state;
+            return {...state, temp: undefined, ...state.temp};
+        },
+        isTemp(state) {
+            return Object.keys(state.temp).length > 0;
         }
     },
     mutations: {
@@ -24,6 +35,9 @@ export const auth: Module<any, any> = {
         },
         setKeycode(state, {keycode}: { keycode: string }) {
             state.keycode = keycode;
+        },
+        setTemp(state, temp: any) {
+            state.temp = temp;
         }
     },
     actions: {
@@ -43,6 +57,13 @@ export const auth: Module<any, any> = {
                 name,
                 keycode
             });
+        },
+        updateTemp(store, newTemp: any) {
+            store.commit('setTemp', newTemp);
+        },
+        saveTemp(store) {
+            const auth = store.rootGetters['auth/auth'];
+            store.commit('setAuth', )
         },
         setupKeycode(store, {barcode, fname, lname, mname, email}: any): Promise<[string, boolean]> {
             return new Promise<[string, boolean]>(async (resolve) => {

@@ -2,7 +2,7 @@
     <div class="account">
         <p class="st-text st-text--header">Account Details</p>
         <div class="st-section">
-            <p class="st-text st-text--section st-section__title">Change your Alias and Keycode</p>
+            <p class="st-text st-text--section st-section__title">Alias and Keycode</p>
             <form class="st-form st-form--bordered" @submit.prevent="submitUser">
                 <div class="st-form__control" style="margin: 0">
                     <label class="st-form__label st-form__label--multi st-form__label--full">
@@ -200,8 +200,8 @@ export default defineComponent({
                 keycode: this.keycode,
             });
             this.alert({
-                title: 'Update Success',
-                text: 'Your Alias and Keycode has been updated'
+                title: 'Success',
+                text: 'Alias and Keycode has been updated'
             });
         },
         revertUser() {
@@ -214,13 +214,13 @@ export default defineComponent({
             const [text, ok] = await this.$store.dispatch('auth/setupKeycode', this.setup);
             if (ok) {
                 this.alert({
-                    title: 'Setup Success',
+                    title: 'Success',
                     text: 'Head to TIMETABLE to view your timetable'
                 }, 5000);
                 this.revertUser();
             } else {
                 this.alert({
-                    title: 'Setup Failure',
+                    title: 'Failure',
                     text: `Reason: '${text}'\nRefer the section 'Manual Keycode Setup' for more information`
                 }, 5000);
             }
@@ -252,12 +252,21 @@ img {
 }
 
 .st-form__label--half {
-    width: 50%;
+    width: calc(50% - 1rem);
+}
+
+.st-form__label--half:not(:last-child) {
+    margin-right: 1rem;
 }
 
 @media screen and (max-width: 1024px) {
     .st-form__label--half {
         width: 100%;
+    }
+
+    .st-form__label--half:not(:last-child) {
+        margin-right: 0;
+        margin-bottom: 1rem;
     }
 }
 </style>

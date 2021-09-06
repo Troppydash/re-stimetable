@@ -21,7 +21,7 @@ export default {
         resetAll() {
             WebSettings.instance.clear();
             this.alert({
-                title: 'Settings Cleared',
+                title: 'Success',
                 text: 'This page will refresh in three seconds'
             }, 3000);
             setTimeout(() => {
