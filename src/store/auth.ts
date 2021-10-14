@@ -2,6 +2,7 @@ import {Module} from 'vuex';
 import {WebSettings} from "@/lib/settings";
 import {NetworkRequest, RequestResponse} from "@/lib/networkRequest";
 const SERVER = 'https://dry-sierra-69491.herokuapp.com';
+const ALT_SERVER = 'https://re-stimetable-server-production.up.railway.app';
 
 export const auth: Module<any, any> = {
     namespaced: true,
@@ -68,7 +69,7 @@ export const auth: Module<any, any> = {
         setupKeycode(store, {barcode, fname, lname, mname, email}: any): Promise<[string, boolean]> {
             return new Promise<[string, boolean]>(async (resolve) => {
                 const request = NetworkRequest.post({
-                    url: SERVER + '/calibrate',
+                    url: ALT_SERVER + '/calibrate',
                     data: {
                         barcode,
                         fname,
