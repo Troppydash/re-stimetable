@@ -4,7 +4,7 @@ const SettingsKeys = [
     'color-mode',
     'user',
     'map',
-    'map-closed'
+    'map-closed',
 ] as const;
 type SettingsKeyType = typeof SettingsKeys[number];
 
@@ -14,6 +14,7 @@ const SettingsDefault: Record<SettingsKeyType, any> = {
     'user': {
         name: 'unnamed',
         keycode: '',
+        visited: false
     },
 
     "map": {
@@ -70,4 +71,10 @@ export class WebSettings {
         });
     }
 
+    public updateSettings(key: SettingsKeyType, value: any) {
+        attemptToOrDefault(() => {
+            const current = this.getSetting(key);
+            this.setSetting(key, {...current, ...value});
+        });
+    }
 }

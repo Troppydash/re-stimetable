@@ -63,7 +63,8 @@ export default defineComponent({
 
 .settings {
     margin: 2rem auto 0;
-    width: 900px;
+    width: 1100px;
+    max-width: 95vw;
     padding-bottom: 5rem;
 
     display: flex;

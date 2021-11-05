@@ -48,8 +48,12 @@
 }
 
 @keyframes st-spin__kf {
-    from {transform:rotate(0deg);}
-    to {transform:rotate(360deg);}
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .st-spin {
@@ -58,6 +62,7 @@
 
 .st-list--full {
     width: 100%;
+
     & > .st-list__section {
         width: 100%;
     }
@@ -82,4 +87,30 @@
 
 .st-text--link {
     word-break: break-all;
+}
+
+
+.st-form--flex {
+    display: flex;
+    flex-wrap: wrap;
+
+    .st-form__control {
+        width: calc(50% - 1rem);
+
+        .st-form__label {
+            width: 100%;
+        }
+    }
+
+    .st-form__control:nth-child(2n):not(:last-child) {
+        margin-left: 1rem;
+    }
+
+    .st-form__control:last-child {
+        width: 100%;
+    }
+}
+
+.st-input.st-input--wider {
+    width: 400px;
 }

@@ -34,6 +34,8 @@
                 Get started <a class="st-text st-text--link" href="/timetable">here</a>
             </p>
         </div>
+
+        <First v-model:is-open="newUser"/>
     </div>
 </template>
 
@@ -42,15 +44,22 @@ import Dialog from "@/components/controls/Dialogs/Dialog";
 import MapCanvas from "@/components/map/MapCanvas";
 import DynamicTable from "@/components/timetable/DynamicTable";
 import ExampleTable from "@/components/timetable/ExampleTable";
+import {WebSettings} from "../lib/settings";
+import First from "../components/first/first";
 export default {
     name: 'Showcase',
-    components: {ExampleTable, DynamicTable, MapCanvas, Dialog},
+    components: {First, ExampleTable, DynamicTable, MapCanvas, Dialog},
     data() {
         return {
+            newUser: false,
         }
     },
     mounted() {
-
+        const settings = WebSettings.instance;
+        if (!settings.getSetting("user").visited) {
+            // open setup dialog
+            this.newUser = true;
+        }
     }
 }
 </script>

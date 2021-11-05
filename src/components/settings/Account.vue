@@ -10,11 +10,13 @@
                         <span class="st-text st-text--70">your custom username</span>
                         <input class="st-input st-input--full" v-model="name"/>
                     </label>
-                    <label class="st-form__label st-form__label--multi st-form__label--full">
-                        <span class="st-text">Network Keycode:</span>
-                        <span class="st-text st-text--70">change only if you know what you are doing</span>
-                        <input class="st-input st-input--full" v-model="keycode"/>
-                    </label>
+                    <Expand>
+                        <label class="st-form__label st-form__label--multi st-form__label--full">
+                            <span class="st-text">Network Keycode:</span>
+                            <span class="st-text st-text--70">change only if you know what you are doing</span>
+                            <input class="st-input st-input--full" v-model="keycode"/>
+                        </label>
+                    </Expand>
                 </div>
                 <div class="st-form__control">
                     <button class="st-form__submit st-button st-button--primary st-button--fill"
@@ -35,39 +37,49 @@
             <p class="st-text">Important! One need to setup a "keycode" for the timetable app to work.</p>
             <p class="st-text">To use, enter your information below and press 'setup' - feel free to leave fields
                 empty.</p>
-            <form class="st-form" style="margin-top: 0.5rem" @submit.prevent="submitSetup">
+            <form class="st-form st-form--flex" style="margin-top: 0.5rem"
+                  @submit.prevent="submitSetup">
                 <div class="st-form__control st-form__control--small">
-                    <label class="st-form__label st-form__label--multi st-form__label--half">
-                        <span class="st-text">First Name:</span>
-                        <span class="st-text st-text--70">your given first name</span>
-                        <input class="st-input st-input--full" v-model="setup.fname"/>
-                    </label>
-                    <label class="st-form__label st-form__label--multi st-form__label--half">
-                        <span class="st-text">Last Name:</span>
-                        <span class="st-text st-text--70">your given last name</span>
-                        <input class="st-input st-input--full" v-model="setup.lname"/>
+                    <label class="st-form__label st-form__label--multi">
+                        <span class="st-text">Barcode:</span>
+                        <span class="st-text st-text--70">the six digit id on your id card</span>
+                        <input class="st-input st-input--full" v-model="setup.barcode"/>
                     </label>
                 </div>
+
                 <div class="st-form__control st-form__control--small">
-                    <label class="st-form__label st-form__label--multi st-form__label--half">
-                        <span class="st-text">Middle Name:</span>
-                        <span class="st-text st-text--70">your middle name (if any)</span>
-                        <input class="st-input st-input--full" v-model="setup.mname"/>
-                    </label>
-                    <label class="st-form__label st-form__label--multi st-form__label--half">
+                    <label class="st-form__label st-form__label--multi">
                         <span class="st-text">Email:</span>
                         <span
                             class="st-text st-text--70">the characters in your school email before '@scotscollege...'</span>
                         <input class="st-input st-input--full" v-model="setup.email"/>
                     </label>
                 </div>
+
+
                 <div class="st-form__control st-form__control--small">
-                    <label class="st-form__label st-form__label--multi st-form__label--half">
-                        <span class="st-text">Barcode:</span>
-                        <span class="st-text st-text--70">the six digit id on your id card</span>
-                        <input class="st-input st-input--full" v-model="setup.barcode"/>
+                    <label class="st-form__label st-form__label--multi">
+                        <span class="st-text">First Name:</span>
+                        <span class="st-text st-text--70">your given first name</span>
+                        <input class="st-input st-input--full" v-model="setup.fname"/>
                     </label>
                 </div>
+                <div class="st-form__control st-form__control--small">
+                    <label class="st-form__label st-form__label--multi">
+                        <span class="st-text">Last Name:</span>
+                        <span class="st-text st-text--70">your given last name</span>
+                        <input class="st-input st-input--full" v-model="setup.lname"/>
+                    </label>
+                </div>
+                <div class="st-form__control st-form__control--small">
+                    <label class="st-form__label st-form__label--multi">
+                        <span class="st-text">Middle Name:</span>
+                        <span class="st-text st-text--70">your middle name (if any)</span>
+                        <input class="st-input st-input--full" v-model="setup.mname"/>
+                    </label>
+
+                </div>
+
                 <div class="st-form__control">
                     <button class="st-form__submit st-button st-button--primary st-button--fill st-button--icon"
                             type="submit" style="margin-right: 1rem"
@@ -163,10 +175,11 @@
 import {defineComponent} from "vue";
 import Dialog from "@/components/controls/Dialogs/Dialog.vue";
 import alerts from "@/lib/mixins/alerts";
+import Expand from "@/components/expand/expand.vue";
 
 export default defineComponent({
     name: "Account",
-    components: {Dialog},
+    components: {Expand, Dialog},
     mixins: [alerts],
     data() {
         return {

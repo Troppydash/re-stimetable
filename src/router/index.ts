@@ -15,6 +15,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/settings',
         name: "Settings",
         component: () => import("../views/Settings.vue")
+    },
+    {
+        path :'/:pathMatch(.*)*',
+        name: 'Not Found',
+        component: () => import("../views/404.vue")
     }
 ]
 
@@ -23,5 +28,11 @@ const router = createRouter({
     routes
 });
 
+router.beforeEach((to, from, next) => {
+    if (typeof to.name === "string") {
+        document.title = `Scots Timetable | ${to.name}`;
+    }
+    next();
+});
 
 export default router

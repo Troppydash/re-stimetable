@@ -68,8 +68,9 @@ export const auth: Module<any, any> = {
         },
         setupKeycode(store, {barcode, fname, lname, mname, email}: any): Promise<[string, boolean]> {
             return new Promise<[string, boolean]>(async (resolve) => {
+                const baseUrl = barcode ? SERVER : ALT_SERVER;
                 const request = NetworkRequest.post({
-                    url: ALT_SERVER + '/calibrate',
+                    url: baseUrl + '/calibrate',
                     data: {
                         barcode,
                         fname,
