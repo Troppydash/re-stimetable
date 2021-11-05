@@ -3,8 +3,8 @@
     border: 2px solid var(--st-primary);
     height: 50px;
     width: 50px;
-    background: var(--st-text);
-    color: var(--st-background);
+    background: var(--st-secondary);
+    color: var(--st-secondary-text);
     font-size: 150%;
 
     cursor: pointer;
@@ -15,10 +15,12 @@
     &.st-fab--opaque {
         background: none;
         border: none;
-        color: var(--st-text);
+        color: var(--st-secondary);
 
         &:hover {
             background: var(--st-primary);
+            color: var(--st-secondary-text);
+
         }
     }
 
@@ -35,7 +37,7 @@
     }
 
     &:hover {
-        background: var(--st-text-dim);
+        background: var(--st-secondary-hover);
     }
 
     &:active {

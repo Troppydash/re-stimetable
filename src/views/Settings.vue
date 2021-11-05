@@ -75,6 +75,10 @@ export default defineComponent({
         position: sticky;
         top: 1rem;
         align-self: flex-start;
+
+        .st-list__item {
+            cursor: pointer;
+        }
     }
 
     .settings__content {

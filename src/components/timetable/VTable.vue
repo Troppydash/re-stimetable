@@ -86,6 +86,7 @@ import {
 } from "@/lib/data/timetable";
 import {DateParser} from "@/lib/dates/dateParser";
 import {PromiseHelpers} from "@/lib/promise/common";
+import {helpers} from "@/lib/helpers";
 
 const COLUMN_WIDTH = 300;
 
@@ -93,10 +94,16 @@ export default defineComponent({
     name: "VTable",
     props: ['content', 'isLoading', 'onMore', 'selected'],
     data() {
+        // TODO: Add scrollable tables
+        const debounce = helpers.debounce(() => {
+            this.checkMore();
+        }, 500);
+
         return {
             bodyWidth: 0,
             bodyVisible: 0,
             bodyScroll: 0,
+            debouncer: () => debounce
         };
     },
     watch: {
@@ -137,7 +144,7 @@ export default defineComponent({
         },
         shouldSeparate(index: number) {
             const day = this.content[index];
-            return index+1 !== this.content.length
+            return index + 1 !== this.content.length
                 && DateParser.ReFormat(day[0].Date, DateParser.COMMON_FORMAT, 'dddd') === 'Friday';
         },
         scroller(): HTMLElement {
@@ -179,6 +186,13 @@ export default defineComponent({
         this.updateSize();
         await PromiseHelpers.WaitUntil(() => !this.isLoading);
         await this.checkMore();
+
+        // @ts-ignore
+        // this.scroller().addEventListener('scroll', this.debouncer());
+    },
+    beforeUnmount() {
+        // @ts-ignore
+        // this.scroller().removeEventListener('scroll', this.debouncer());
     }
 });
 </script>
@@ -187,7 +201,7 @@ export default defineComponent({
 @border-color1: var(--st-secondary);
 @border1: 1px solid @border-color1;
 @border-color2: var(--st-primary-focus);
-@border2: 2px dashed @border-color2;
+@border2: 2px solid @border-color2;
 
 .st-vtable {
     color: var(--st-text);
@@ -217,6 +231,11 @@ export default defineComponent({
             height: 10%;
             display: flex;
             align-items: center;
+
+
+            .st-text {
+                color: var(--st-primary-text);
+            }
         }
 
         & > div {
@@ -250,10 +269,14 @@ export default defineComponent({
         position: relative;
 
         .scroller {
-            overflow: hidden;
+            overflow-y: hidden;
             display: flex;
             justify-content: left;
             align-items: stretch;
+        }
+
+        .scroller::-webkit-scrollbar {
+            height: 0; //only hide the horizontal scrollbar
         }
 
         .st-vtable__scroller {

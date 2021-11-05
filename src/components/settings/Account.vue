@@ -108,7 +108,7 @@
                 Open Instructions
             </button>
             <Dialog :is-open="showInstructions" :on-close="() => setInstructions(false)"
-                    title="Instructions" option2="I am Done" :on-option2="() => setInstructions(false)">
+                    title="Instructions" option2="I am done" :on-option2="() => setInstructions(false)">
                 <div class="st-section">
                     <p class="st-text st-text--section st-section__title">Step 1: Log into PCSchool Spider</p>
                     <p class="st-text">

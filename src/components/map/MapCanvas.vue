@@ -438,6 +438,10 @@ export default defineComponent({
             overflow-x: hidden;
         }
 
+        .st-text, span {
+            color: #d9d9d9;
+        }
+
         .map-siderbar__toggle {
             display: flex;
             align-items: center;

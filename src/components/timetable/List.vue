@@ -85,15 +85,15 @@ export default defineComponent({
 }
 
 ::-webkit-scrollbar-track {
-    background: transparent;
+    background: var(--st-background-focus);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #ffffff;
+    background: var(--st-secondary);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #bdbdbd;
+    background: var(--st-secondary-hover);
 }
 
 

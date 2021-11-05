@@ -402,6 +402,8 @@ export default defineComponent({
         max-height: 400px;
         overflow-y: auto;
 
+        box-shadow: black 1px 1px 4px;
+
         & > div {
             padding: 0.25rem 0.5rem;
             background: #ffffff;

@@ -35,8 +35,8 @@
             </p>
         </div>
 
-        <First v-model:is-open="newUser"/>
     </div>
+    <First v-model:is-open="newUser"/>
 </template>
 
 <script>

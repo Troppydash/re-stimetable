@@ -53,6 +53,15 @@ export default {
     flex-wrap: wrap;
     z-index: 20;
 
+    .st-text {
+        color: var(--st-primary-text);
+    }
+
+
+    .st-text:active {
+        color: var(--st-primary-text-dim);
+    }
+
     .topbar__actions {
         display: flex;
         align-items: center;
@@ -63,6 +72,8 @@ export default {
         & > * {
             margin: 0 1rem;
         }
+
+
     }
 
     .topbar__details {
