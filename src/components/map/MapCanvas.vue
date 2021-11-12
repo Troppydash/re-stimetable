@@ -417,13 +417,17 @@ export default defineComponent({
     .map-canvas {
         width: 100%;
         height: 100%;
+
+        & > canvas {
+            display: block;
+        }
     }
 
     .map-sidebar {
         position: absolute;
-        bottom: 4px;
+        bottom: 0;
         left: 0;
-        height: calc(100% - 4px);
+        height: 100%;
         color: #d9d9d9;
 
         background: rgba(0, 0, 0, 0.29);
